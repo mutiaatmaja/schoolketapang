@@ -7,14 +7,14 @@ use Illuminate\Http\Response;
 class BeritaController extends Controller
 {
     private const ARTICLES = [
-        'ppdb-2025-2026' => [
-            'title' => 'Penerimaan Peserta Didik Baru (PPDB) Tahun Ajaran 2025/2026',
+        'spmb-2025-2026' => [
+            'title' => 'Seleksi Penerimaan Murid Baru (SPMB) Tahun Ajaran 2025/2026',
             'date' => '15 Oktober 2024',
             'category' => 'Pengumuman',
-            'excerpt' => 'Pendaftaran PPDB dibuka dengan alur yang lebih sederhana, transparan, dan terintegrasi secara online.',
+            'excerpt' => 'Pendaftaran SPMB dibuka dengan alur yang lebih sederhana, transparan, dan terintegrasi secara online.',
             'content' => [
                 'Sekolah membuka pendaftaran peserta didik baru untuk tahun ajaran 2025/2026 melalui jalur online agar orang tua lebih mudah mengakses informasi dan mengisi formulir dari rumah.',
-                'Calon pendaftar dapat menyiapkan dokumen persyaratan sejak awal, memeriksa jadwal seleksi, dan mengikuti status pendaftaran melalui dashboard PPDB.',
+                'Calon pendaftar dapat menyiapkan dokumen persyaratan sejak awal, memeriksa jadwal seleksi, dan mengikuti status pendaftaran melalui dashboard SPMB.',
                 'Tim sekolah juga menyiapkan pendampingan bagi wali murid yang membutuhkan bantuan selama proses pendaftaran berlangsung.',
             ],
         ],

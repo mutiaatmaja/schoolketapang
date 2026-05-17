@@ -53,7 +53,8 @@ new class extends Component {
 
 <div class="space-y-4 p-4 md:p-8">
     <header class="space-y-2">
-        <p class="text-xs font-semibold uppercase tracking-wide text-sky-600">Form PPDB</p>
+        <p class="text-xs font-semibold uppercase tracking-wide text-sky-600">Form SPMB (Seleksi Penerimaan Murid Baru)
+        </p>
         <h1 class="text-2xl font-bold text-slate-800">Pendaftaran Siswa Baru</h1>
         <p class="text-sm text-slate-600">Isi data secara bertahap agar lebih mudah saat menggunakan HP.</p>
     </header>

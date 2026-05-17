@@ -1,11 +1,12 @@
 <?php
 
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 new class extends Component {
     public string $search = '';
 
-    public array $applicants = [['id' => 1, 'nomor' => 'PPDB-2026-0001', 'nama' => 'Alya Safira', 'status' => 'submitted'], ['id' => 2, 'nomor' => 'PPDB-2026-0002', 'nama' => 'Raka Pratama', 'status' => 'under_review'], ['id' => 3, 'nomor' => 'PPDB-2026-0003', 'nama' => 'Naila Putri', 'status' => 'verified']];
+    public array $applicants = [['id' => 1, 'nomor' => 'SPMB-2026-0001', 'nama' => 'Alya Safira', 'status' => 'submitted'], ['id' => 2, 'nomor' => 'SPMB-2026-0002', 'nama' => 'Raka Pratama', 'status' => 'under_review'], ['id' => 3, 'nomor' => 'SPMB-2026-0003', 'nama' => 'Naila Putri', 'status' => 'verified']];
 
     public function getFilteredApplicantsProperty(): array
     {
@@ -30,7 +31,7 @@ new class extends Component {
 
 <div class="space-y-4 p-4 md:p-8">
     <header class="space-y-2">
-        <p class="text-xs font-semibold uppercase tracking-wide text-sky-600">Admin PPDB</p>
+        <p class="text-xs font-semibold uppercase tracking-wide text-sky-600">Admin SPMB</p>
         <h1 class="text-2xl font-bold text-slate-800">Data Pendaftar</h1>
     </header>
 

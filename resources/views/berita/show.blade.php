@@ -58,7 +58,7 @@
             </a>
             <div class="flex items-center gap-3 text-sm font-semibold">
                 <a href="{{ route('depan.beranda') }}" class="text-on-surface-variant hover:text-primary">Beranda</a>
-                <a href="{{ route('ppdb.informasi') }}" class="text-on-surface-variant hover:text-primary">PPDB</a>
+                <a href="{{ route('ppdb.informasi') }}" class="text-on-surface-variant hover:text-primary">SPMB</a>
             </div>
         </div>
     </header>
@@ -67,7 +67,8 @@
         <section class="overflow-hidden rounded-3xl bg-primary text-white shadow-sm">
             <div class="grid gap-0 lg:grid-cols-[1.2fr_0.8fr]">
                 <div class="p-6 sm:p-8 lg:p-10">
-                    <span class="inline-flex rounded-full bg-white/15 px-4 py-2 text-xs font-bold uppercase tracking-[0.24em] text-white/90">
+                    <span
+                        class="inline-flex rounded-full bg-white/15 px-4 py-2 text-xs font-bold uppercase tracking-[0.24em] text-white/90">
                         {{ $article['category'] }}
                     </span>
                     <h1 class="mt-5 font-headline text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
@@ -119,7 +120,7 @@
                         <a href="{{ route('ppdb.informasi') }}"
                             class="inline-flex items-center gap-2 rounded-full bg-secondary-container px-4 py-2 text-sm font-bold text-on-secondary-container transition hover:opacity-90">
                             <span class="material-symbols-outlined text-[18px]">assignment</span>
-                            PPDB
+                            SPMB
                         </a>
                         <a href="{{ route('depan.beranda') }}"
                             class="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-bold text-white transition hover:bg-primary-container">
@@ -149,7 +150,7 @@
                     </dl>
                 </div>
 
-                @if (! empty($relatedArticles))
+                @if (!empty($relatedArticles))
                     <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
                         <p class="text-xs font-bold uppercase tracking-[0.24em] text-secondary">Berita lain</p>
                         <div class="mt-4 space-y-4">

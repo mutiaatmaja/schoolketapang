@@ -19,7 +19,7 @@
             <a href="{{ route('depan.beranda') }}" wire:navigate class="text-sm font-bold text-sky-700">SD Modern</a>
             <nav class="flex items-center gap-3 text-xs font-medium text-slate-600">
                 <a href="{{ route('depan.beranda') }}" wire:navigate class="hover:text-slate-900">Depan</a>
-                <a href="{{ route('ppdb.informasi') }}" wire:navigate class="hover:text-slate-900">PPDB</a>
+                <a href="{{ route('ppdb.informasi') }}" wire:navigate class="hover:text-slate-900">SPMB</a>
                 @auth
                     <a href="{{ route('admin.dashboard') }}" wire:navigate class="hover:text-slate-900">Admin</a>
                     <form action="{{ route('logout') }}" method="POST" class="inline">

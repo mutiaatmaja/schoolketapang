@@ -162,7 +162,7 @@
                 <a class="text-on-surface-variant font-medium font-label-md text-label-md hover:text-primary transition-colors duration-200"
                     href="#kontak">Kontak</a>
                 <a class="bg-secondary-container text-on-secondary-container font-label-md text-label-md px-5 py-2 rounded-full hover:opacity-90 transition-all"
-                    href="{{ route('ppdb.informasi') }}">Daftar PPDB</a>
+                    href="{{ route('ppdb.informasi') }}">Daftar SPMB</a>
                 @auth
                     <a class="bg-primary text-on-primary font-label-md text-label-md px-5 py-2 rounded-full hover:opacity-90 transition-all"
                         href="{{ route('admin.dashboard') }}">Dashboard</a>
@@ -344,7 +344,7 @@
                 </div>
                 <div class="space-y-6">
                     <!-- News Card 1 -->
-                    <a href="{{ route('berita.show', 'ppdb-2025-2026') }}"
+                    <a href="{{ route('berita.show', 'spmb-2025-2026') }}"
                         class="group flex gap-4 p-4 rounded-2xl hover:bg-white hover:shadow-md transition-all cursor-pointer">
                         <div class="w-24 h-24 rounded-xl overflow-hidden shrink-0">
                             <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
@@ -355,7 +355,7 @@
                             <span class="text-secondary font-label-md text-label-md">15 Okt 2024</span>
                             <h4
                                 class="font-headline-md text-headline-md text-on-surface line-clamp-2 group-hover:text-primary transition-colors">
-                                Penerimaan Peserta Didik Baru (PPDB) Tahun Ajaran 2025/2026</h4>
+                                Seleksi Penerimaan Murid Baru (SPMB) Tahun Ajaran 2025/2026</h4>
                         </div>
                     </a>
                     <!-- News Card 2 -->
@@ -535,7 +535,7 @@
                     <li><a class="hover:text-secondary transition-all" href="#">Kurikulum</a></li>
                     <li><a class="hover:text-secondary transition-all" href="#">Fasilitas</a></li>
                     <li><a class="hover:text-secondary transition-all"
-                            href="{{ route('ppdb.informasi') }}">Pendaftaran PPDB</a></li>
+                            href="{{ route('ppdb.informasi') }}">Pendaftaran SPMB</a></li>
                     <li><a class="hover:text-secondary transition-all" href="#">Ekstrakurikuler</a></li>
                 </ul>
             </div>

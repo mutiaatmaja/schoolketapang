@@ -104,7 +104,7 @@
 
             <div class="mt-6 flex items-center justify-between text-sm">
                 <a href="{{ route('depan.beranda') }}" class="text-primary hover:underline">Beranda</a>
-                <a href="{{ route('ppdb.informasi') }}" class="text-primary hover:underline">PPDB</a>
+                <a href="{{ route('ppdb.informasi') }}" class="text-primary hover:underline">SPMB</a>
             </div>
         </div>
     </div>

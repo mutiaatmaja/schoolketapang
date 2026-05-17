@@ -26,7 +26,7 @@ new class extends Component {
 
     public function openPpdb(): void
     {
-        $this->dispatch('toast', type: 'info', message: 'Membuka halaman informasi PPDB...');
+        $this->dispatch('toast', type: 'info', message: 'Membuka halaman informasi SPMB...');
         $this->redirectRoute('ppdb.informasi', navigate: true);
     }
 };
@@ -60,7 +60,7 @@ new class extends Component {
                             <button type="button" wire:click="openPpdb" wire:loading.attr="disabled"
                                 wire:target="openPpdb"
                                 class="inline-flex items-center justify-center rounded-xl bg-cyan-400 px-4 py-3 text-sm font-semibold text-slate-900 disabled:opacity-60">
-                                <span wire:loading.remove wire:target="openPpdb">Daftar PPDB Sekarang</span>
+                                <span wire:loading.remove wire:target="openPpdb">Daftar SPMB Sekarang</span>
                                 <span wire:loading wire:target="openPpdb">Memproses pendaftaran...</span>
                             </button>
 
