@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\SpmbRegistration;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -19,27 +18,27 @@ class SpmbRegistrationFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(),
-            'registration_number' => 'SPMB-'.now()->format('Y').'-'.fake()->unique()->numerify('####'),
+            'registration_number' => 'SPMB-'.now()->format('Y').'-'.fake()->unique()->numerify('#####'),
             'name' => fake()->name(),
             'birth_place' => fake()->city(),
             'birth_date' => fake()->dateTimeBetween('-12 years', '-5 years')->format('Y-m-d'),
             'nik' => fake()->unique()->numerify('################'),
+            'family_card_number' => fake()->unique()->numerify('################'),
             'gender' => fake()->randomElement(['Laki-laki', 'Perempuan']),
             'religion' => fake()->randomElement(['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Konghucu']),
             'father_name' => fake()->name('male'),
             'mother_name' => fake()->name('female'),
-            'father_occupation' => fake()->optional()->jobTitle(),
-            'mother_occupation' => fake()->optional()->jobTitle(),
-            'father_phone' => fake()->optional()->phoneNumber(),
-            'mother_phone' => fake()->optional()->phoneNumber(),
-            'address' => fake()->optional()->address(),
-            'notes' => fake()->optional()->sentence(),
+            'father_occupation' => fake()->jobTitle(),
+            'mother_occupation' => fake()->jobTitle(),
+            'father_phone' => fake()->phoneNumber(),
+            'mother_phone' => fake()->phoneNumber(),
+            'address' => fake()->address(),
+            'notes' => fake()->sentence(),
             'birth_certificate_path' => 'spmb/birth-certificates/sample.pdf',
             'family_card_path' => 'spmb/family-cards/sample.pdf',
             'student_photo_path' => 'spmb/student-photos/sample.jpg',
-            'kindergarten_certificate_path' => fake()->boolean(50) ? 'spmb/kindergarten-certificates/sample.pdf' : null,
-            'status' => 'submitted',
+            'kindergarten_certificate_path' => 'spmb/kindergarten-certificates/sample.pdf',
+            'status' => fake()->randomElement(['submitted', 'verified', 'rejected']),
             'submitted_at' => now(),
         ];
     }

@@ -55,10 +55,10 @@
     <div class="flex min-h-screen items-center justify-center px-4 py-10 sm:px-6 lg:px-8">
         <div class="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
             <div class="mb-6 text-center">
-                <p class="text-xs font-bold uppercase tracking-[0.24em] text-secondary">Login Akun</p>
+                <p class="text-xs font-bold uppercase tracking-[0.24em] text-secondary">Login Admin</p>
                 <h1 class="mt-3 font-headline text-2xl font-bold text-primary">Masuk ke akun Anda</h1>
                 <p class="mt-2 text-sm leading-6 text-on-surface-variant">
-                    Gunakan email dan kata sandi yang terdaftar untuk admin atau orang tua pendaftar SPMB.
+                    Gunakan email dan kata sandi yang terdaftar.
                 </p>
             </div>
 
@@ -104,7 +104,7 @@
 
             <div class="mt-6 flex items-center justify-between text-sm">
                 <a href="{{ route('depan.beranda') }}" class="text-primary hover:underline">Beranda</a>
-                <a href="{{ route('ppdb.register') }}" class="text-primary hover:underline">Daftar akun orang tua</a>
+                <a href="{{ route('ppdb.informasi') }}" class="text-primary hover:underline">SPMB</a>
             </div>
         </div>
     </div>

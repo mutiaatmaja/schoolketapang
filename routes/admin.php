@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function () {
+Route::prefix('admin')->middleware(['auth', 'role:superadmin|admin'])->name('admin.')->group(function () {
     Route::livewire('/', 'pages::admin.dashboard')->name('dashboard');
     Route::livewire('/akademik', 'pages::admin.akademik.index')->name('akademik.index');
     Route::livewire('/akademik/siswa', 'pages::admin.akademik.siswa')->name('akademik.siswa');
@@ -15,10 +15,11 @@ Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function () 
     Route::livewire('/publik/prestasi', 'pages::admin.publik.prestasi')->name('publik.prestasi');
     Route::livewire('/ppdb', 'pages::admin.ppdb.index')->name('ppdb.index');
     Route::livewire('/ppdb/pendaftar', 'pages::admin.ppdb.pendaftar')->name('ppdb.pendaftar');
-    Route::livewire('/ppdb/akun-orang-tua', 'pages::admin.ppdb.akun-orang-tua')->name('ppdb.orang-tua');
-    Route::livewire('/ppdb/akun-orang-tua/{user}', 'pages::admin.ppdb.detail-orang-tua')->name('ppdb.orang-tua.show');
+    Route::livewire('/ppdb/pendaftar/{registration:registration_number}', 'pages::admin.ppdb.detail-pendaftar')->name('ppdb.pendaftar.detail');
     Route::livewire('/ppdb/belum-validasi', 'pages::admin.ppdb.belum-validasi')->name('ppdb.belum-validasi');
     Route::livewire('/ppdb/lulus', 'pages::admin.ppdb.lulus')->name('ppdb.lulus');
     Route::livewire('/ppdb/cadangan', 'pages::admin.ppdb.cadangan')->name('ppdb.cadangan');
     Route::livewire('/ppdb/ditolak', 'pages::admin.ppdb.ditolak')->name('ppdb.ditolak');
+    Route::livewire('/kelola-user', 'pages::admin.kelola-user.users')->name('users.index');
+    Route::livewire('/kelola-user/role', 'pages::admin.kelola-user.roles')->name('users.roles');
 });

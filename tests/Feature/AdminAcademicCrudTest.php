@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Imports\StudentsImport;
 use App\Imports\TeachersImport;
+use App\Models\Role;
 use App\Models\SchoolClass;
 use App\Models\Student;
 use App\Models\Teacher;
@@ -156,7 +157,14 @@ class AdminAcademicCrudTest extends TestCase
 
     public function test_academic_summary_page_uses_dynamic_counts(): void
     {
+        /** @var User $user */
         $user = User::factory()->create();
+        Role::query()->create([
+            'name' => 'admin',
+            'display_name' => 'Admin',
+            'description' => 'Mengelola data operasional sekolah dan PPDB.',
+        ]);
+        $user->syncRoles(['admin']);
 
         Teacher::factory()->count(2)->create();
         $class = SchoolClass::factory()->create(['name' => '3']);

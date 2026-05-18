@@ -1,17 +1,12 @@
 <?php
 
-use App\Http\Controllers\Auth\RegisteredParentController;
+use App\Http\Controllers\Ppdb\SpmbRegistrationDetailController;
+use App\Http\Controllers\Ppdb\SpmbRegistrationRecapPdfController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('ppdb')->name('ppdb.')->group(function () {
     Route::livewire('/', 'pages::ppdb.informasi')->name('informasi');
-
-    Route::middleware('guest')->group(function (): void {
-        Route::get('/register', [RegisteredParentController::class, 'create'])->name('register');
-        Route::post('/register', [RegisteredParentController::class, 'store'])->name('register.store');
-    });
-
-    Route::middleware('auth')->group(function (): void {
-        Route::livewire('/daftar', 'pages::ppdb.daftar')->name('daftar');
-    });
+    Route::livewire('/daftar', 'pages::ppdb.daftar')->name('daftar');
+    Route::get('/detail/{registrationNumber}', SpmbRegistrationDetailController::class)->name('detail');
+    Route::get('/rekap/{registrationNumber}/pdf', SpmbRegistrationRecapPdfController::class)->name('rekap-pdf');
 });

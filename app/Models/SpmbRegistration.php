@@ -5,7 +5,6 @@ namespace App\Models;
 use Database\Factories\SpmbRegistrationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SpmbRegistration extends Model
 {
@@ -16,12 +15,12 @@ class SpmbRegistration extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'user_id',
         'registration_number',
         'name',
         'birth_place',
         'birth_date',
         'nik',
+        'family_card_number',
         'gender',
         'religion',
         'father_name',
@@ -53,15 +52,5 @@ class SpmbRegistration extends Model
             'birth_date' => 'date',
             'submitted_at' => 'datetime',
         ];
-    }
-
-    public function scopeLatestFirst($query)
-    {
-        return $query->latest('submitted_at')->latest('id');
-    }
-
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
     }
 }

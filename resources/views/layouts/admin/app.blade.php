@@ -164,7 +164,7 @@
     </div>
 
     <aside data-admin-sidebar
-        class="fixed left-0 top-0 z-50 flex h-full w-72 flex-col overflow-y-auto border-r border-outline-variant/20 bg-surface-container-lowest shadow-md dark:bg-inverse-surface -translate-x-full lg:translate-x-0 transition-transform duration-300"
+        class="fixed left-0 top-0 z-1 flex h-full w-72 flex-col overflow-y-auto border-r border-outline-variant/20 bg-surface-container-lowest shadow-md dark:bg-inverse-surface -translate-x-full lg:translate-x-0 transition-transform duration-300"
         :class="{ 'translate-x-0': sidebarOpen }">
         <div class="p-8 flex items-center gap-3">
             <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
@@ -197,6 +197,7 @@
             $isAkademik = request()->routeIs('admin.akademik.*');
             $isPublik = request()->routeIs('admin.publik.*');
             $isPpdb = request()->routeIs('admin.ppdb.*');
+            $isUserManagement = request()->routeIs('admin.users.*');
         @endphp
 
         <nav class="flex-1 space-y-2 px-4">
@@ -263,9 +264,6 @@
                     <a wire:navigate href="{{ route('admin.ppdb.pendaftar') }}"
                         class="{{ $submenuBase }} {{ request()->routeIs('admin.ppdb.pendaftar') ? $submenuActive : $submenuInactive }}">Semua
                         Peserta</a>
-                    <a wire:navigate href="{{ $to('admin.ppdb.orang-tua') }}"
-                        class="{{ $submenuBase }} {{ request()->routeIs('admin.ppdb.orang-tua') || request()->routeIs('admin.ppdb.orang-tua.show') ? $submenuActive : $submenuInactive }}">Akun
-                        Orang Tua</a>
                     <a wire:navigate href="{{ $to('admin.ppdb.belum-validasi') }}"
                         class="{{ $submenuBase }} {{ request()->routeIs('admin.ppdb.belum-validasi') ? $submenuActive : $submenuInactive }}">Belum
                         Validasi</a>
@@ -278,6 +276,21 @@
                     <a wire:navigate href="{{ $to('admin.ppdb.ditolak') }}"
                         class="{{ $submenuBase }} {{ request()->routeIs('admin.ppdb.ditolak') ? $submenuActive : $submenuInactive }}">Peserta
                         Ditolak</a>
+                </div>
+            </div>
+
+            <div class="space-y-1">
+                <a wire:navigate href="{{ $to('admin.users.index') }}"
+                    class="{{ $menuBase }} {{ $isUserManagement ? $menuActive : $menuInactive }}">
+                    <span class="material-symbols-outlined" data-icon="manage_accounts">manage_accounts</span>
+                    <span class="font-label-md text-label-md">Kelola User</span>
+                </a>
+                <div class="space-y-1">
+                    <a wire:navigate href="{{ $to('admin.users.index') }}"
+                        class="{{ $submenuBase }} {{ request()->routeIs('admin.users.index') ? $submenuActive : $submenuInactive }}">Data
+                        User</a>
+                    <a wire:navigate href="{{ $to('admin.users.roles') }}"
+                        class="{{ $submenuBase }} {{ request()->routeIs('admin.users.roles') ? $submenuActive : $submenuInactive }}">Role</a>
                 </div>
             </div>
 
@@ -295,7 +308,7 @@
     </aside>
     <!-- TopAppBar (Authority: JSON) -->
     <header
-        class="flex justify-between items-center h-16 px-4 lg:px-8 w-full lg:ml-72 lg:w-[calc(100%-18rem)] fixed top-0 right-0 z-40 bg-surface-container-lowest/80 backdrop-blur-md dark:bg-surface-dim/80 shadow-sm">
+        class="flex justify-between items-center h-16 px-4 lg:px-8 w-full lg:ml-72 lg:w-[calc(100%-18rem)] fixed top-0 right-0 z-1 bg-surface-container-lowest/80 backdrop-blur-md dark:bg-surface-dim/80 shadow-sm">
         <div class="flex items-center gap-3">
             <button
                 class="lg:hidden text-on-surface-variant hover:text-primary transition-colors p-1 rounded-lg hover:bg-surface-container"

@@ -7,10 +7,12 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
+        "dompdf/dompdf": "^3.1",
         "laravel-lang/common": "^6.8",
         "laravel/boost": "^2.4",
         "laravel/framework": "^13.7",
         "laravel/tinker": "^3.0",
+        "linkxtr/laravel-qrcode": "^2.5",
         "livewire/livewire": "^4.3",
         "maatwebsite/excel": "^3.1",
         "santigarcor/laratrust": "^8.5",

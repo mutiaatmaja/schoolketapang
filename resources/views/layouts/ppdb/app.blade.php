@@ -1,70 +1,69 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="id">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>SPMB Online - {{ config('app.name', 'Sekolah SD') }}</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>SPMB SD Ketapang</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <style>
-        [x-cloak] {
-            display: none !important;
-        }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Manrope', 'sans-serif'],
+                    },
+                },
+            },
+        };
+    </script>
 </head>
 
-<body class="min-h-screen bg-slate-100 text-slate-900 antialiased">
-    <div
-        class="min-h-screen bg-[radial-gradient(circle_at_top,rgba(14,165,233,0.16),transparent_42%),linear-gradient(180deg,#eff6ff_0%,#f8fafc_24%,#f8fafc_100%)]">
-        <header class="sticky top-0 z-30 border-b border-sky-100 bg-white/95 backdrop-blur">
-            <div class="mx-auto flex max-w-md items-center justify-between px-4 py-3 sm:max-w-2xl sm:px-6">
-                <a href="{{ route('ppdb.informasi') }}" wire:navigate class="text-sm font-semibold text-sky-700">SPMB
-                    Online</a>
-                <div class="flex items-center gap-2 text-xs text-slate-500">
-                    <a href="{{ route('depan.beranda') }}"
-                        class="rounded-full bg-slate-100 px-3 py-1.5 font-semibold text-slate-600">Beranda</a>
-                    @auth
-                        <a href="{{ route('ppdb.daftar') }}" wire:navigate
-                            class="rounded-full bg-sky-600 px-3 py-1.5 font-semibold text-white">Dashboard</a>
-                        <form action="{{ route('logout') }}" method="POST">
-                            @csrf
-                            <button type="submit"
-                                class="rounded-full bg-slate-100 px-3 py-1.5 font-semibold text-slate-600">Keluar</button>
-                        </form>
-                    @else
-                        <a href="{{ route('login') }}"
-                            class="rounded-full bg-slate-100 px-3 py-1.5 font-semibold text-slate-600">Masuk</a>
-                        <a href="{{ route('ppdb.register') }}"
-                            class="rounded-full bg-sky-600 px-3 py-1.5 font-semibold text-white">Daftar Akun</a>
-                    @endauth
-                </div>
+<body
+    class="min-h-screen bg-[radial-gradient(circle_at_top,#f6c453_0%,#f5efe2_28%,#eef4f1_60%,#eef4f1_100%)] text-slate-900">
+    <div class="mx-auto flex min-h-screen w-full max-w-md flex-col px-4 pb-8 pt-4 sm:max-w-lg sm:px-5">
+        <header
+            class="mb-5 flex items-center justify-between rounded-3xl bg-white/80 px-4 py-3 shadow-sm ring-1 ring-white/60 backdrop-blur">
+            <a href="{{ route('ppdb.informasi') }}" wire:navigate class="text-sm font-semibold text-[#1d4f45]">SPMB SD
+                Ketapang</a>
+            <div class="flex items-center gap-3 text-xs font-medium text-slate-500">
+                <a href="{{ route('ppdb.informasi') }}" wire:navigate class="transition hover:text-[#1d4f45]">Info</a>
+                <a href="{{ route('ppdb.daftar') }}" wire:navigate class="transition hover:text-[#1d4f45]">Daftar</a>
+                <a href="{{ route('login') }}" class="transition hover:text-[#1d4f45]">Admin</a>
             </div>
         </header>
 
-        <main class="mx-auto max-w-md px-4 py-5 sm:max-w-2xl sm:px-6 sm:py-8">
+        <main class="flex-1">
             {{ $slot }}
         </main>
     </div>
 
-    <div x-data="{ show: false, type: 'info', message: '', timeout: null }"
-        x-on:toast.window="
-            show = true;
-            type = $event.detail.type ?? 'info';
-            message = $event.detail.message ?? 'Proses selesai.';
-            clearTimeout(timeout);
-            timeout = setTimeout(() => show = false, 2800);
-        "
-        x-show="show" x-transition.opacity.duration.200ms x-cloak class="fixed inset-x-0 bottom-4 z-50 px-4">
-        <div class="mx-auto w-full max-w-sm rounded-2xl px-4 py-3 text-sm font-medium text-white shadow-xl"
-            :class="{
-                'bg-emerald-600': type === 'success',
-                'bg-rose-600': type === 'error',
-                'bg-amber-500': type === 'warning',
-                'bg-sky-600': type === 'info'
-            }"
-            x-text="message"></div>
-    </div>
+    <div id="toast-container"
+        class="pointer-events-none fixed inset-x-0 top-4 z-50 mx-auto flex w-full max-w-sm flex-col gap-3 px-4"></div>
+
+    <script>
+        window.addEventListener('toast', event => {
+            const detail = event.detail?.[0] ?? event.detail ?? {};
+            const toast = document.createElement('div');
+            const palette = detail.type === 'success' ?
+                'border-emerald-200 bg-emerald-50 text-emerald-800' :
+                'border-rose-200 bg-rose-50 text-rose-800';
+
+            toast.className =
+                `pointer-events-auto rounded-2xl border px-4 py-3 text-sm font-semibold shadow-lg ${palette}`;
+            toast.textContent = detail.message ?? 'Informasi terbaru tersedia.';
+            document.getElementById('toast-container')?.appendChild(toast);
+
+            window.setTimeout(() => {
+                toast.remove();
+            }, 3200);
+        });
+    </script>
 </body>
 
 </html>
