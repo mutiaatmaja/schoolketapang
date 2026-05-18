@@ -148,14 +148,24 @@
             grid-template-rows: auto auto;
             gap: 24px;
         }
+
+        [x-cloak] {
+            display: none;
+        }
     </style>
     @livewireStyles()
 </head>
 
-<body class="h-screen overflow-hidden font-body-md text-on-background antialiased">
+<body class="h-screen overflow-hidden font-body-md text-on-background antialiased" x-data="{ sidebarOpen: false }"
+    @close-sidebar.window="sidebarOpen = false">
     <!-- SideNavBar (Authority: JSON) -->
+    <!-- Mobile Sidebar Backdrop -->
+    <div x-cloak x-show="sidebarOpen" @click="sidebarOpen = false" class="fixed inset-0 z-40 bg-black/50 lg:hidden">
+    </div>
+
     <aside data-admin-sidebar
-        class="fixed left-0 top-0 z-50 flex h-full w-72 flex-col overflow-y-auto border-r border-outline-variant/20 bg-surface-container-lowest shadow-md dark:bg-inverse-surface">
+        class="fixed left-0 top-0 z-50 flex h-full w-72 flex-col overflow-y-auto border-r border-outline-variant/20 bg-surface-container-lowest shadow-md dark:bg-inverse-surface -translate-x-full lg:translate-x-0 transition-transform duration-300"
+        :class="{ 'translate-x-0': sidebarOpen }">
         <div class="p-8 flex items-center gap-3">
             <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
                 <span class="material-symbols-outlined text-white" data-icon="school">school</span>
@@ -282,9 +292,16 @@
     </aside>
     <!-- TopAppBar (Authority: JSON) -->
     <header
-        class="flex justify-between items-center h-16 px-8 ml-72 w-[calc(100%-18rem)] fixed top-0 right-0 z-40 bg-surface-container-lowest/80 backdrop-blur-md dark:bg-surface-dim/80 shadow-sm">
-        <h2 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">Dashboard
-            Administrasi</h2>
+        class="flex justify-between items-center h-16 px-4 lg:px-8 w-full lg:ml-72 lg:w-[calc(100%-18rem)] fixed top-0 right-0 z-40 bg-surface-container-lowest/80 backdrop-blur-md dark:bg-surface-dim/80 shadow-sm">
+        <div class="flex items-center gap-3">
+            <button
+                class="lg:hidden text-on-surface-variant hover:text-primary transition-colors p-1 rounded-lg hover:bg-surface-container"
+                @click="sidebarOpen = !sidebarOpen">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+            <h2 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">Dashboard
+                Administrasi</h2>
+        </div>
         <div class="flex items-center gap-6">
             <div class="relative focus-within:ring-2 focus-within:ring-primary rounded-full">
                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
@@ -315,7 +332,7 @@
         </div>
     </header>
     <!-- Main Content Canvas -->
-    <main class="fixed bottom-0 left-72 right-0 top-16 overflow-y-auto p-8">
+    <main class="fixed bottom-0 left-0 lg:left-72 right-0 top-16 overflow-y-auto p-8">
         {{ $slot }}
 
     </main>
@@ -344,6 +361,9 @@
             restoreSidebarScroll();
             document.addEventListener('livewire:navigate', saveSidebarScroll);
             document.addEventListener('livewire:navigated', restoreSidebarScroll);
+            document.addEventListener('livewire:navigate', () => {
+                window.dispatchEvent(new CustomEvent('close-sidebar'));
+            });
         })();
     </script>
     <!-- FAB Suppression: On Dashboard, FAB can be active -->

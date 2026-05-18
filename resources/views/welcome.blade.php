@@ -142,14 +142,20 @@
             background-size: cover;
             background-position: center
         }
+
+        [x-cloak] {
+            display: none;
+        }
     </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
 <body class="bg-background text-on-surface font-body-md overflow-x-hidden">
     <!-- TopNavBar -->
-    <header class="bg-surface/90 backdrop-blur-md fixed top-0 w-full z-50 shadow-[0_4px_20px_rgba(30,64,175,0.08)]">
+    <header class="bg-surface/90 backdrop-blur-md fixed top-0 w-full z-50 shadow-[0_4px_20px_rgba(30,64,175,0.08)]"
+        x-data="{ mobileMenuOpen: false }">
         <div class="max-w-container-max mx-auto px-gutter flex justify-between items-center h-20">
-            <div class="font-headline-md text-headline-md font-bold text-primary">Elementary School</div>
+            <div class="font-headline-md text-headline-md font-bold text-primary">{{ $schoolName }}</div>
             <nav class="hidden md:flex gap-8 items-center">
                 <a class="text-primary border-b-2 border-primary pb-1 font-bold font-label-md text-label-md"
                     href="#hero">Home</a>
@@ -179,9 +185,44 @@
             </nav>
             <div class="flex items-center gap-4">
                 <button class="material-symbols-outlined text-primary p-2">search</button>
-                <button class="md:hidden material-symbols-outlined text-primary">menu</button>
+                <button class="md:hidden material-symbols-outlined text-primary p-2 cursor-pointer"
+                    @click="mobileMenuOpen = !mobileMenuOpen">menu</button>
             </div>
         </div>
+
+        <!-- Mobile Menu -->
+        <nav x-cloak x-show="mobileMenuOpen" @click.away="mobileMenuOpen = false"
+            class="md:hidden absolute top-full left-0 right-0 bg-surface border-b border-surface-variant shadow-lg z-40">
+            <div class="max-w-container-max mx-auto px-gutter py-4 flex flex-col gap-2">
+                <a class="text-primary border-b-2 border-primary pb-2 font-bold font-label-md text-label-md"
+                    href="#hero" @click="mobileMenuOpen = false">Home</a>
+                <a class="text-on-surface-variant font-medium font-label-md text-label-md hover:text-primary transition-colors duration-200 pb-2"
+                    href="#statistik" @click="mobileMenuOpen = false">Info Sekolah</a>
+                <a class="text-on-surface-variant font-medium font-label-md text-label-md hover:text-primary transition-colors duration-200 pb-2"
+                    href="#visi-misi" @click="mobileMenuOpen = false">Visi &amp; Misi</a>
+                <a class="text-on-surface-variant font-medium font-label-md text-label-md hover:text-primary transition-colors duration-200 pb-2"
+                    href="#berita" @click="mobileMenuOpen = false">Berita</a>
+                <a class="text-on-surface-variant font-medium font-label-md text-label-md hover:text-primary transition-colors duration-200 pb-2"
+                    href="#kontak" @click="mobileMenuOpen = false">Kontak</a>
+                <div class="border-t border-surface-variant pt-4 mt-2 flex flex-col gap-2">
+                    <a class="bg-secondary-container text-on-secondary-container font-label-md text-label-md px-5 py-2 rounded-full hover:opacity-90 transition-all text-center"
+                        href="{{ route('ppdb.informasi') }}" @click="mobileMenuOpen = false">Daftar SPMB</a>
+                    @auth
+                        <a class="bg-primary text-on-primary font-label-md text-label-md px-5 py-2 rounded-full hover:opacity-90 transition-all text-center"
+                            href="{{ route('admin.dashboard') }}" @click="mobileMenuOpen = false">Dashboard</a>
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button
+                                class="w-full bg-surface-container-highest text-on-surface font-label-md text-label-md px-5 py-2 rounded-full hover:opacity-90 transition-all"
+                                type="submit">Keluar</button>
+                        </form>
+                    @else
+                        <a class="bg-primary text-on-primary font-label-md text-label-md px-5 py-2 rounded-full hover:opacity-90 transition-all text-center"
+                            href="{{ route('login') }}" @click="mobileMenuOpen = false">Masuk</a>
+                    @endauth
+                </div>
+            </div>
+        </nav>
     </header>
     <!-- Hero Slider -->
     <section id="hero"
@@ -196,8 +237,7 @@
             <span
                 class="inline-block bg-secondary-container text-on-secondary-container font-label-md text-label-md px-6 py-2 rounded-full mb-6">Motto
                 Sekolah</span>
-            <h1 class="text-white font-headline-xl text-headline-xl md:text-headline-xl mb-8">Cerdas, Berakhlak, dan
-                Berprestasi Tanpa Batas</h1>
+            <h1 class="text-white font-headline-xl text-headline-xl md:text-headline-xl mb-8">{{ $schoolMotto }}</h1>
             <div class="flex flex-col md:flex-row gap-4 justify-center">
                 <a href="{{ route('ppdb.informasi') }}"
                     class="inline-block bg-primary text-on-primary font-label-md text-label-md px-10 py-4 rounded-3xl shadow-lg hover:opacity-90 transition-all">Daftar
@@ -245,42 +285,26 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-stretch">
             <div class="lg:col-span-4 bg-primary text-on-primary p-12 rounded-3xl flex flex-col justify-center">
                 <h2 class="font-headline-lg text-headline-lg mb-6">Informasi Sekolah</h2>
-                <p class="font-body-md text-body-md opacity-90">Elementary School berkomitmen memberikan pendidikan
-                    terbaik untuk generasi masa depan Indonesia.</p>
+                <p class="font-body-md text-body-md opacity-90">{{ $schoolDescription }}</p>
             </div>
             <div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-gutter">
-                <div
-                    class="bg-surface-container p-8 rounded-3xl flex items-start gap-4 hover:shadow-md transition-shadow">
-                    <div class="bg-white p-3 rounded-2xl text-primary material-symbols-outlined">school</div>
-                    <div>
-                        <div class="font-label-md text-label-md text-primary mb-1 uppercase tracking-wider">NISN</div>
-                        <div class="font-headline-md text-headline-md">12345678</div>
+                @forelse ($infoCards as $item)
+                    <div
+                        class="bg-surface-container p-8 rounded-3xl flex items-start gap-4 hover:shadow-md transition-shadow">
+                        <div class="bg-white p-3 rounded-2xl text-primary material-symbols-outlined">
+                            {{ $item['icon'] }}</div>
+                        <div>
+                            <div class="font-label-md text-label-md text-primary mb-1 uppercase tracking-wider">
+                                {{ $item['label'] }}</div>
+                            <div class="font-body-md text-body-md">{{ $item['value'] }}</div>
+                        </div>
                     </div>
-                </div>
-                <div
-                    class="bg-surface-container p-8 rounded-3xl flex items-start gap-4 hover:shadow-md transition-shadow">
-                    <div class="bg-white p-3 rounded-2xl text-primary material-symbols-outlined">location_on</div>
-                    <div>
-                        <div class="font-label-md text-label-md text-primary mb-1 uppercase tracking-wider">Alamat</div>
-                        <div class="font-body-md text-body-md">Jl. Pendidikan No. 123, Jakarta Selatan</div>
+                @empty
+                    <div
+                        class="md:col-span-2 bg-surface-container p-8 rounded-3xl text-center text-on-surface-variant">
+                        Informasi sekolah belum tersedia.
                     </div>
-                </div>
-                <div
-                    class="bg-surface-container p-8 rounded-3xl flex items-start gap-4 hover:shadow-md transition-shadow">
-                    <div class="bg-white p-3 rounded-2xl text-primary material-symbols-outlined">mail</div>
-                    <div>
-                        <div class="font-label-md text-label-md text-primary mb-1 uppercase tracking-wider">Email</div>
-                        <div class="font-body-md text-body-md">info@sdnegeri.sch.id</div>
-                    </div>
-                </div>
-                <div
-                    class="bg-surface-container p-8 rounded-3xl flex items-start gap-4 hover:shadow-md transition-shadow">
-                    <div class="bg-white p-3 rounded-2xl text-primary material-symbols-outlined">call</div>
-                    <div>
-                        <div class="font-label-md text-label-md text-primary mb-1 uppercase tracking-wider">Telp</div>
-                        <div class="font-body-md text-body-md">(021) 123456</div>
-                    </div>
-                </div>
+                @endforelse
             </div>
         </div>
     </section>
@@ -292,32 +316,22 @@
                     <div class="mb-12">
                         <h2 class="font-headline-xl text-headline-xl text-primary mb-6">Visi</h2>
                         <div class="p-8 bg-white rounded-3xl border-l-8 border-secondary shadow-sm">
-                            <p class="font-headline-md text-headline-md text-on-surface italic">"Menjadi institusi
-                                pendidikan dasar unggulan yang membentuk karakter siswa religius, cerdas, kreatif, dan
-                                kompetitif secara global."</p>
+                            <p class="font-headline-md text-headline-md text-on-surface italic">
+                                "{{ $vision ?? 'Visi sekolah belum tersedia.' }}"</p>
                         </div>
                     </div>
                     <div>
                         <h2 class="font-headline-xl text-headline-xl text-primary mb-6">Misi</h2>
                         <ul class="space-y-4">
-                            <li class="flex gap-4 items-start">
-                                <span
-                                    class="bg-primary text-on-primary w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold">1</span>
-                                <p class="font-body-lg text-body-lg">Menanamkan nilai-nilai keagamaan dan etika budi
-                                    pekerti luhur dalam setiap kegiatan belajar mengajar.</p>
-                            </li>
-                            <li class="flex gap-4 items-start">
-                                <span
-                                    class="bg-primary text-on-primary w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold">2</span>
-                                <p class="font-body-lg text-body-lg">Menyelenggarakan kurikulum modern berbasis
-                                    teknologi informasi yang adaptif dengan kebutuhan zaman.</p>
-                            </li>
-                            <li class="flex gap-4 items-start">
-                                <span
-                                    class="bg-primary text-on-primary w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold">3</span>
-                                <p class="font-body-lg text-body-lg">Mengembangkan bakat dan minat siswa melalui
-                                    program ekstrakurikuler yang beragam dan profesional.</p>
-                            </li>
+                            @forelse ($missions as $mission)
+                                <li class="flex gap-4 items-start">
+                                    <span
+                                        class="bg-primary text-on-primary w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold">{{ $loop->iteration }}</span>
+                                    <p class="font-body-lg text-body-lg">{{ $mission }}</p>
+                                </li>
+                            @empty
+                                <li class="font-body-lg text-body-lg">Misi sekolah belum tersedia.</li>
+                            @endforelse
                         </ul>
                     </div>
                 </div>
@@ -340,57 +354,39 @@
                 <div class="flex justify-between items-end mb-10">
                     <h3 class="font-headline-lg text-headline-lg text-primary border-l-4 border-secondary pl-4">Berita
                         &amp; Pengumuman</h3>
-                    <a class="text-primary font-label-md text-label-md hover:underline" href="#">Lihat Semua</a>
+                    <a class="text-primary font-label-md text-label-md hover:underline" href="#berita">Lihat Semua</a>
                 </div>
                 <div class="space-y-6">
-                    <!-- News Card 1 -->
-                    <a href="{{ route('berita.show', 'spmb-2025-2026') }}"
-                        class="group flex gap-4 p-4 rounded-2xl hover:bg-white hover:shadow-md transition-all cursor-pointer">
-                        <div class="w-24 h-24 rounded-xl overflow-hidden shrink-0">
-                            <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                                data-alt="A close-up shot of a modern tablet displaying educational apps in a bright classroom. Small hands of children are interacting with the screen. The background is softly blurred with colors of blue and white, creating a clean, tech-savvy educational atmosphere."
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0PAU0lO8zixTkJ_pvhO3H0L8BhJ-nKc80t27AuF3gHlaxJMa4OYOAdFqJ1PwSQib6MF5K6FstnkED4ZygcVfw1lhae2CCtWkTs771DG6rgNCj4Fn3xzxtPSh4LAKvbz7hnJ7aL6B_V-S-pdbTiB92zj41R_dyjz2xcMOBqC93flrJBiXed-dl_GCMzu62fsinyWG5_vDMLvE6cUfSq1krWU2LcbgsPnh6o77Hu2xT50eNIFqfTNn8c1TZepWnwAKhDJ3Ef9S0TJ4" />
+                    @forelse ($newsArticles->take(2) as $article)
+                        <a href="{{ route('berita.show', $article['slug']) }}"
+                            class="group flex gap-4 p-4 rounded-2xl hover:bg-white hover:shadow-md transition-all cursor-pointer">
+                            <div
+                                class="w-24 h-24 rounded-xl overflow-hidden shrink-0 bg-surface-container flex items-center justify-center">
+                                <span class="material-symbols-outlined text-primary text-4xl">article</span>
+                            </div>
+                            <div>
+                                <span class="text-secondary font-label-md text-label-md">{{ $article['date'] }}</span>
+                                <h4
+                                    class="font-headline-md text-headline-md text-on-surface line-clamp-2 group-hover:text-primary transition-colors">
+                                    {{ $article['title'] }}</h4>
+                            </div>
+                        </a>
+                    @empty
+                        <div class="rounded-2xl bg-white p-6 text-on-surface-variant shadow-sm">Belum ada berita yang
+                            dipublikasikan.</div>
+                    @endforelse
+                    @if ($newsArticles->count() > 2)
+                        <div class="pl-4 space-y-4 pt-4 border-t border-outline-variant">
+                            @foreach ($newsArticles->slice(2) as $article)
+                                <a href="{{ route('berita.show', $article['slug']) }}"
+                                    class="flex justify-between items-center group cursor-pointer">
+                                    <span
+                                        class="font-body-md text-body-md group-hover:text-primary">{{ $article['title'] }}</span>
+                                    <span class="text-on-surface-variant text-sm">{{ $article['date'] }}</span>
+                                </a>
+                            @endforeach
                         </div>
-                        <div>
-                            <span class="text-secondary font-label-md text-label-md">15 Okt 2024</span>
-                            <h4
-                                class="font-headline-md text-headline-md text-on-surface line-clamp-2 group-hover:text-primary transition-colors">
-                                Seleksi Penerimaan Murid Baru (SPMB) Tahun Ajaran 2025/2026</h4>
-                        </div>
-                    </a>
-                    <!-- News Card 2 -->
-                    <a href="{{ route('berita.show', 'seminar-parenting-digital') }}"
-                        class="group flex gap-4 p-4 rounded-2xl hover:bg-white hover:shadow-md transition-all cursor-pointer">
-                        <div class="w-24 h-24 rounded-xl overflow-hidden shrink-0">
-                            <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                                data-alt="A celebratory event at a school auditorium where teachers and parents are gathered. The stage is decorated with blue and yellow balloons. Soft ambient lighting creates a warm, welcoming, and professional institutional feel."
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIrZMyLAOpVUCO0rs8SCalHLbvCnbiH0Eqiw1qe6tkksw8nhUA0iRsrRn_nZTVK8NdEEtcO837ZqheQwRNYgIiXZqZsVnf4AC3ScPDZOdzRSygmugqNQoaujVVctQyzJiVKQPLJBfX_ZT6erCIRgTtsjlH-PCiz_J-58BXtLOAZwu-BysCgvKF6CJ2WWbvYdrTJ15KQ2p3ZSyAEc2XE7h9bo6_ZK1-_Qq8N6sQD-p6z9Jz6vxeJPtVjXguVlZtvZimiZkw16bZ9r4" />
-                        </div>
-                        <div>
-                            <span class="text-secondary font-label-md text-label-md">12 Okt 2024</span>
-                            <h4
-                                class="font-headline-md text-headline-md text-on-surface line-clamp-2 group-hover:text-primary transition-colors">
-                                Seminar Parenting: Mendidik Anak di Era Digital</h4>
-                        </div>
-                    </a>
-                    <!-- Simplified List for the rest -->
-                    <div class="pl-4 space-y-4 pt-4 border-t border-outline-variant">
-                        <div class="flex justify-between items-center group cursor-pointer">
-                            <span class="font-body-md text-body-md group-hover:text-primary">Jadwal UTS Semester Ganjil
-                                2024</span>
-                            <span class="text-on-surface-variant text-sm">05 Okt</span>
-                        </div>
-                        <div class="flex justify-between items-center group cursor-pointer">
-                            <span class="font-body-md text-body-md group-hover:text-primary">Pengumuman Libur Nasional
-                                Maulid Nabi</span>
-                            <span class="text-on-surface-variant text-sm">28 Sep</span>
-                        </div>
-                        <div class="flex justify-between items-center group cursor-pointer">
-                            <span class="font-body-md text-body-md group-hover:text-primary">Workshop Kreativitas Guru:
-                                Media Pembelajaran</span>
-                            <span class="text-on-surface-variant text-sm">20 Sep</span>
-                        </div>
-                    </div>
+                    @endif
                 </div>
             </div>
             <!-- Achievements Column -->
@@ -516,17 +512,16 @@
         <div
             class="max-w-container-max mx-auto px-gutter py-section-padding-desktop grid grid-cols-1 md:grid-cols-4 gap-gutter">
             <div class="space-y-6">
-                <div class="font-headline-md text-headline-md font-bold text-on-surface">Elementary School</div>
-                <p class="font-body-md text-body-md text-on-surface-variant">Mencetak generasi cerdas dan berakhlak
-                    mulia melalui pendidikan berkualitas dan lingkungan yang mendukung.</p>
+                <div class="font-headline-md text-headline-md font-bold text-on-surface">{{ $schoolName }}</div>
+                <p class="font-body-md text-body-md text-on-surface-variant">{{ $schoolDescription }}</p>
             </div>
             <div>
                 <h4 class="font-label-md text-label-md text-primary mb-6 uppercase">Kontak Kami</h4>
                 <ul class="space-y-4 text-on-surface-variant font-body-md text-body-md">
-                    <li>Address: 123 Education Lane</li>
-                    <li>Email: info@school.edu</li>
-                    <li>Telp: (555) 0123</li>
-                    <li>NISN: 12345678</li>
+                    <li>Alamat: {{ $contactAddress }}</li>
+                    <li>Email: {{ $contactEmail }}</li>
+                    <li>Telp: {{ $contactPhone }}</li>
+                    <li>NPSN: {{ $schoolNpsn }}</li>
                 </ul>
             </div>
             <div>
@@ -556,7 +551,7 @@
                     </a>
                 </div>
                 <div class="mt-8 text-on-surface-variant text-sm">
-                    © 2024 Elementary School. All rights reserved.
+                    © 2024 {{ $schoolName }}. All rights reserved.
                 </div>
             </div>
         </div>

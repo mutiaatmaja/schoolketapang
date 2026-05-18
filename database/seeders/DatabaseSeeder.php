@@ -15,6 +15,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            SchoolInformationSeeder::class,
+            VisionMissionSeeder::class,
+            NewsArticleSeeder::class,
+            SchoolClassSeeder::class,
             LaratrustRoleUserSeeder::class,
         ]);
     }
