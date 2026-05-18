@@ -8,13 +8,7 @@ use Livewire\Component;
 new class extends Component {
     public function getStatsProperty(): array
     {
-        return [
-            ['label' => 'Total Pendaftar', 'value' => SpmbRegistration::query()->count(), 'route' => 'admin.ppdb.pendaftar'],
-            ['label' => 'Akun Orang Tua', 'value' => $this->parentAccountsCount(), 'route' => 'admin.ppdb.orang-tua'],
-            ['label' => 'Belum Validasi', 'value' => SpmbRegistration::query()->where('status', 'submitted')->count(), 'route' => 'admin.ppdb.belum-validasi'],
-            ['label' => 'Peserta Lulus', 'value' => SpmbRegistration::query()->where('status', 'verified')->count(), 'route' => 'admin.ppdb.lulus'],
-            ['label' => 'Peserta Ditolak', 'value' => SpmbRegistration::query()->where('status', 'rejected')->count(), 'route' => 'admin.ppdb.ditolak'],
-        ];
+        return [['label' => 'Total Pendaftar', 'value' => SpmbRegistration::query()->count(), 'route' => 'admin.ppdb.pendaftar'], ['label' => 'Akun Orang Tua', 'value' => $this->parentAccountsCount(), 'route' => 'admin.ppdb.orang-tua'], ['label' => 'Belum Validasi', 'value' => SpmbRegistration::query()->where('status', 'submitted')->count(), 'route' => 'admin.ppdb.belum-validasi'], ['label' => 'Peserta Lulus', 'value' => SpmbRegistration::query()->where('status', 'verified')->count(), 'route' => 'admin.ppdb.lulus'], ['label' => 'Peserta Ditolak', 'value' => SpmbRegistration::query()->where('status', 'rejected')->count(), 'route' => 'admin.ppdb.ditolak']];
     }
 
     public function getLatestRegistrationsProperty(): Collection
@@ -42,7 +36,8 @@ new class extends Component {
     <header class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <p class="text-xs font-semibold uppercase tracking-wide text-sky-600">Admin SPMB</p>
         <h1 class="mt-2 text-2xl font-bold text-slate-800">Ringkasan SPMB</h1>
-        <p class="mt-2 text-sm text-slate-600">Pantau jumlah pendaftar, akun orang tua, dan pengajuan terbaru dari satu halaman.</p>
+        <p class="mt-2 text-sm text-slate-600">Pantau jumlah pendaftar, akun orang tua, dan pengajuan terbaru dari satu
+            halaman.</p>
     </header>
 
     <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -82,19 +77,22 @@ new class extends Component {
                 <tbody>
                     @forelse ($this->latestRegistrations as $registration)
                         <tr wire:key="ppdb-latest-{{ $registration->id }}" class="border-b border-slate-100">
-                            <td class="px-4 py-3 font-medium text-slate-700">{{ $registration->registration_number }}</td>
+                            <td class="px-4 py-3 font-medium text-slate-700">{{ $registration->registration_number }}
+                            </td>
                             <td class="px-4 py-3 text-slate-600">{{ $registration->name }}</td>
                             <td class="px-4 py-3 text-slate-600">
                                 <p>{{ $registration->user?->name ?? '-' }}</p>
                                 <p class="mt-1 text-xs text-slate-500">{{ $registration->user?->email ?? '-' }}</p>
                             </td>
                             <td class="px-4 py-3">
-                                <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">{{ $registration->status }}</span>
+                                <span
+                                    class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">{{ $registration->status }}</span>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="px-4 py-8 text-center text-slate-500">Belum ada pengajuan SPMB.</td>
+                            <td colspan="4" class="px-4 py-8 text-center text-slate-500">Belum ada pengajuan SPMB.
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>

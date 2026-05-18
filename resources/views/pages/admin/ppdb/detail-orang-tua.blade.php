@@ -25,7 +25,8 @@ new class extends Component {
             <div>
                 <p class="text-xs font-semibold uppercase tracking-wide text-sky-600">Admin SPMB</p>
                 <h1 class="mt-2 text-2xl font-bold text-slate-800">Detail Akun Orang Tua</h1>
-                <p class="mt-2 text-sm text-slate-600">Lihat akun parent beserta nama anak yang sudah dimasukkan ke SPMB.</p>
+                <p class="mt-2 text-sm text-slate-600">Lihat akun parent beserta nama anak yang sudah dimasukkan ke SPMB.
+                </p>
             </div>
             <a href="{{ route('admin.ppdb.orang-tua') }}" wire:navigate
                 class="inline-flex items-center justify-center rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700">
@@ -57,13 +58,15 @@ new class extends Component {
             <div class="flex items-center justify-between gap-4">
                 <div>
                     <h2 class="text-lg font-bold text-slate-800">Anak Yang Dimasukkan</h2>
-                    <p class="mt-1 text-sm text-slate-500">Setiap pendaftaran menampilkan nama anak, nomor pendaftaran, dan status terakhir.</p>
+                    <p class="mt-1 text-sm text-slate-500">Setiap pendaftaran menampilkan nama anak, nomor pendaftaran,
+                        dan status terakhir.</p>
                 </div>
             </div>
 
             <div class="mt-4 space-y-4">
                 @forelse ($parent->spmbRegistrations as $registration)
-                    <article wire:key="parent-child-{{ $registration->id }}" class="rounded-2xl border border-slate-200 p-4">
+                    <article wire:key="parent-child-{{ $registration->id }}"
+                        class="rounded-2xl border border-slate-200 p-4">
                         <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                             <div>
                                 <p class="text-lg font-bold text-slate-800">{{ $registration->name }}</p>
@@ -90,7 +93,8 @@ new class extends Component {
                         </div>
                     </article>
                 @empty
-                    <div class="rounded-2xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">
+                    <div
+                        class="rounded-2xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">
                         Belum ada anak yang didaftarkan oleh akun ini.
                     </div>
                 @endforelse

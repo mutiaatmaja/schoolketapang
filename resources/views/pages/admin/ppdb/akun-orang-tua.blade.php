@@ -33,7 +33,7 @@ new class extends Component {
             'name' => ['required', 'string', 'min:3', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($this->editingId)],
             'password' => [$passwordRequired ? 'required' : 'nullable', 'nullable', 'string', 'min:8'],
-            'passwordConfirmation' => [($passwordRequired || $this->password !== '') ? 'required' : 'nullable', 'nullable', 'same:password'],
+            'passwordConfirmation' => [$passwordRequired || $this->password !== '' ? 'required' : 'nullable', 'nullable', 'same:password'],
         ];
     }
 
@@ -43,17 +43,15 @@ new class extends Component {
             ->whereHas('roles', function ($query): void {
                 $query->where('name', 'orang_tua');
             })
-            ->with(['spmbRegistrations' => function ($query): void {
-                $query->select('id', 'user_id', 'registration_number', 'name', 'status', 'submitted_at')
-                    ->latest('submitted_at')
-                    ->latest('id');
-            }])
+            ->with([
+                'spmbRegistrations' => function ($query): void {
+                    $query->select('id', 'user_id', 'registration_number', 'name', 'status', 'submitted_at')->latest('submitted_at')->latest('id');
+                },
+            ])
             ->withCount('spmbRegistrations')
             ->when($this->search !== '', function ($query): void {
                 $query->where(function ($innerQuery): void {
-                    $innerQuery
-                        ->where('name', 'like', '%' . $this->search . '%')
-                        ->orWhere('email', 'like', '%' . $this->search . '%');
+                    $innerQuery->where('name', 'like', '%' . $this->search . '%')->orWhere('email', 'like', '%' . $this->search . '%');
                 });
             })
             ->latest('id')
@@ -81,10 +79,7 @@ new class extends Component {
     public function save(): void
     {
         $validated = $this->validate();
-        $role = Role::query()->firstOrCreate(
-            ['name' => 'orang_tua'],
-            ['display_name' => 'Orang Tua', 'description' => 'Akun orang tua untuk mengelola pendaftaran SPMB.'],
-        );
+        $role = Role::query()->firstOrCreate(['name' => 'orang_tua'], ['display_name' => 'Orang Tua', 'description' => 'Akun orang tua untuk mengelola pendaftaran SPMB.']);
 
         $parent = $this->editingId ? $this->findParent($this->editingId) : new User();
 
@@ -159,7 +154,8 @@ new class extends Component {
         <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
                 <h2 class="text-lg font-bold text-slate-800">Daftar Akun Orang Tua</h2>
-                <p class="mt-1 text-sm text-slate-500">Lihat jumlah anak yang didaftarkan, ubah akun, hapus akun, atau buka detail anak.</p>
+                <p class="mt-1 text-sm text-slate-500">Lihat jumlah anak yang didaftarkan, ubah akun, hapus akun, atau
+                    buka detail anak.</p>
             </div>
             <button type="button" wire:click="openCreate" wire:loading.attr="disabled" wire:target="openCreate"
                 class="rounded-xl bg-sky-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
@@ -199,11 +195,13 @@ new class extends Component {
                                     <p class="mt-1 text-slate-600">{{ $parent->email }}</p>
                                 </td>
                                 <td class="px-4 py-3 text-slate-600">
-                                    <p class="font-medium text-slate-700">{{ $parent->spmb_registrations_count }} pendaftaran</p>
+                                    <p class="font-medium text-slate-700">{{ $parent->spmb_registrations_count }}
+                                        pendaftaran</p>
                                     @if ($parent->spmbRegistrations->isNotEmpty())
                                         <div class="mt-2 space-y-1">
                                             @foreach ($parent->spmbRegistrations->take(2) as $registration)
-                                                <p wire:key="parent-registration-{{ $registration->id }}" class="text-xs text-slate-500">
+                                                <p wire:key="parent-registration-{{ $registration->id }}"
+                                                    class="text-xs text-slate-500">
                                                     {{ $registration->name }} · {{ $registration->registration_number }}
                                                 </p>
                                             @endforeach
@@ -215,10 +213,12 @@ new class extends Component {
                                 <td class="px-4 py-3 text-slate-600">
                                     @php($latestRegistration = $parent->spmbRegistrations->first())
                                     @if ($latestRegistration)
-                                        <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                                        <span
+                                            class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
                                             {{ $latestRegistration->status }}
                                         </span>
-                                        <p class="mt-2 text-xs text-slate-500">{{ $latestRegistration->submitted_at?->format('d M Y H:i') }}</p>
+                                        <p class="mt-2 text-xs text-slate-500">
+                                            {{ $latestRegistration->submitted_at?->format('d M Y H:i') }}</p>
                                     @else
                                         <span class="text-xs text-slate-500">Belum ada pengajuan</span>
                                     @endif
@@ -232,21 +232,27 @@ new class extends Component {
                                         <button type="button" wire:click="openEdit({{ $parent->id }})"
                                             wire:loading.attr="disabled" wire:target="openEdit({{ $parent->id }})"
                                             class="rounded-lg bg-amber-100 px-3 py-2 text-xs font-semibold text-amber-700 disabled:opacity-50">
-                                            <span wire:loading.remove wire:target="openEdit({{ $parent->id }})">Edit</span>
-                                            <span wire:loading wire:target="openEdit({{ $parent->id }})">Membuka...</span>
+                                            <span wire:loading.remove
+                                                wire:target="openEdit({{ $parent->id }})">Edit</span>
+                                            <span wire:loading
+                                                wire:target="openEdit({{ $parent->id }})">Membuka...</span>
                                         </button>
                                         <button type="button" wire:click="confirmDelete({{ $parent->id }})"
-                                            wire:loading.attr="disabled" wire:target="confirmDelete({{ $parent->id }})"
+                                            wire:loading.attr="disabled"
+                                            wire:target="confirmDelete({{ $parent->id }})"
                                             class="rounded-lg bg-rose-100 px-3 py-2 text-xs font-semibold text-rose-700 disabled:opacity-50">
-                                            <span wire:loading.remove wire:target="confirmDelete({{ $parent->id }})">Hapus</span>
-                                            <span wire:loading wire:target="confirmDelete({{ $parent->id }})">Menyiapkan...</span>
+                                            <span wire:loading.remove
+                                                wire:target="confirmDelete({{ $parent->id }})">Hapus</span>
+                                            <span wire:loading
+                                                wire:target="confirmDelete({{ $parent->id }})">Menyiapkan...</span>
                                         </button>
                                     </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="px-4 py-8 text-center text-slate-500">Belum ada akun orang tua.</td>
+                                <td colspan="4" class="px-4 py-8 text-center text-slate-500">Belum ada akun orang
+                                    tua.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -261,16 +267,20 @@ new class extends Component {
             <div class="w-full max-w-2xl max-h-[calc(100vh-3rem)] overflow-y-auto rounded-3xl bg-white p-6 shadow-xl">
                 <div class="flex items-start justify-between gap-4">
                     <div>
-                        <h2 class="text-lg font-bold text-slate-800">{{ $editingId ? 'Edit Akun Orang Tua' : 'Tambah Akun Orang Tua' }}</h2>
-                        <p class="mt-1 text-sm text-slate-500">Gunakan email aktif. Kosongkan kata sandi jika tidak ingin menggantinya saat edit.</p>
+                        <h2 class="text-lg font-bold text-slate-800">
+                            {{ $editingId ? 'Edit Akun Orang Tua' : 'Tambah Akun Orang Tua' }}</h2>
+                        <p class="mt-1 text-sm text-slate-500">Gunakan email aktif. Kosongkan kata sandi jika tidak
+                            ingin menggantinya saat edit.</p>
                     </div>
-                    <button type="button" wire:click="closeModal" class="text-slate-400 hover:text-slate-600">Tutup</button>
+                    <button type="button" wire:click="closeModal"
+                        class="text-slate-400 hover:text-slate-600">Tutup</button>
                 </div>
 
                 <form wire:submit="save" class="mt-6 space-y-5">
                     <div>
                         <label class="text-sm font-semibold text-slate-700">Nama Orang Tua</label>
-                        <input type="text" wire:model="name" class="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm" />
+                        <input type="text" wire:model="name"
+                            class="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm" />
                         @error('name')
                             <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
                         @enderror
@@ -278,7 +288,8 @@ new class extends Component {
 
                     <div>
                         <label class="text-sm font-semibold text-slate-700">Email</label>
-                        <input type="email" wire:model="email" class="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm" />
+                        <input type="email" wire:model="email"
+                            class="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm" />
                         @error('email')
                             <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
                         @enderror
@@ -287,14 +298,16 @@ new class extends Component {
                     <div class="grid gap-4 md:grid-cols-2">
                         <div>
                             <label class="text-sm font-semibold text-slate-700">Kata Sandi</label>
-                            <input type="password" wire:model="password" class="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm" />
+                            <input type="password" wire:model="password"
+                                class="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm" />
                             @error('password')
                                 <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
                             @enderror
                         </div>
                         <div>
                             <label class="text-sm font-semibold text-slate-700">Konfirmasi Kata Sandi</label>
-                            <input type="password" wire:model="passwordConfirmation" class="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm" />
+                            <input type="password" wire:model="passwordConfirmation"
+                                class="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm" />
                             @error('passwordConfirmation')
                                 <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
                             @enderror
@@ -319,7 +332,8 @@ new class extends Component {
         <div class="fixed inset-0 flex items-center justify-center bg-slate-900/50 px-4" style="z-index: 120;">
             <div class="w-full max-w-md rounded-3xl bg-white p-6 shadow-xl">
                 <h2 class="text-lg font-bold text-slate-800">Hapus akun orang tua?</h2>
-                <p class="mt-2 text-sm text-slate-500">Akun parent dan data pendaftaran anak yang terhubung akan ikut terhapus.</p>
+                <p class="mt-2 text-sm text-slate-500">Akun parent dan data pendaftaran anak yang terhubung akan ikut
+                    terhapus.</p>
                 <div class="mt-6 flex justify-end gap-3">
                     <button type="button" wire:click="closeModal"
                         class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">Batal</button>

@@ -307,7 +307,8 @@
         </div>
         <div class="flex items-center gap-6">
             <div class="relative focus-within:ring-2 focus-within:ring-primary rounded-full">
-                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
+                <span
+                    class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
                     data-icon="search">search</span>
                 <input
                     class="bg-surface-container border-none rounded-full py-2 pl-10 pr-4 w-64 text-sm focus:outline-none transition-all"
