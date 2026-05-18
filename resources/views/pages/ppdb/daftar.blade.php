@@ -103,30 +103,10 @@ new #[Layout('layouts::ppdb.app')] class extends Component {
             'mother_phone' => $validated['motherPhone'] ?: null,
             'address' => $validated['address'],
             'notes' => $validated['notes'] ?: null,
-            'birth_certificate_path' => $this->storeDocument(
-                file: $this->birthCertificate,
-                directory: 'akte_lahir',
-                registrationNumber: $registrationNumber,
-                includeRegistrationNumber: true,
-            ),
-            'family_card_path' => $this->storeDocument(
-                file: $this->familyCard,
-                directory: 'kk',
-                registrationNumber: $registrationNumber,
-                includeRegistrationNumber: false,
-            ),
-            'student_photo_path' => $this->storeDocument(
-                file: $this->studentPhoto,
-                directory: 'pasfoto',
-                registrationNumber: $registrationNumber,
-                includeRegistrationNumber: true,
-            ),
-            'kindergarten_certificate_path' => $this->kindergartenCertificate ? $this->storeDocument(
-                file: $this->kindergartenCertificate,
-                directory: 'ijazah_tk',
-                registrationNumber: $registrationNumber,
-                includeRegistrationNumber: true,
-            ) : null,
+            'birth_certificate_path' => $this->storeDocument(file: $this->birthCertificate, directory: 'akte_lahir', registrationNumber: $registrationNumber, includeRegistrationNumber: true),
+            'family_card_path' => $this->storeDocument(file: $this->familyCard, directory: 'kk', registrationNumber: $registrationNumber, includeRegistrationNumber: false),
+            'student_photo_path' => $this->storeDocument(file: $this->studentPhoto, directory: 'pasfoto', registrationNumber: $registrationNumber, includeRegistrationNumber: true),
+            'kindergarten_certificate_path' => $this->kindergartenCertificate ? $this->storeDocument(file: $this->kindergartenCertificate, directory: 'ijazah_tk', registrationNumber: $registrationNumber, includeRegistrationNumber: true) : null,
             'status' => 'submitted',
             'submitted_at' => now(),
         ]);
@@ -211,27 +191,13 @@ new #[Layout('layouts::ppdb.app')] class extends Component {
         return method_exists($file, 'getClientOriginalName') ? $file->getClientOriginalName() : null;
     }
 
-    private function storeDocument(
-        TemporaryUploadedFile $file,
-        string $directory,
-        string $registrationNumber,
-        bool $includeRegistrationNumber,
-    ): string
+    private function storeDocument(TemporaryUploadedFile $file, string $directory, string $registrationNumber, bool $includeRegistrationNumber): string
     {
-        $nameSegment = Str::of($this->name)
-            ->ascii()
-            ->lower()
-            ->replaceMatches('/[^a-z0-9]+/', '_')
-            ->trim('_')
-            ->value();
+        $nameSegment = Str::of($this->name)->ascii()->lower()->replaceMatches('/[^a-z0-9]+/', '_')->trim('_')->value();
 
-        $segments = array_filter([
-            $includeRegistrationNumber ? $registrationNumber : null,
-            $this->nik,
-            $nameSegment,
-        ]);
+        $segments = array_filter([$includeRegistrationNumber ? $registrationNumber : null, $this->nik, $nameSegment]);
 
-        $filename = implode('_', $segments).'.'.$file->getClientOriginalExtension();
+        $filename = implode('_', $segments) . '.' . $file->getClientOriginalExtension();
 
         return $file->storeAs($directory, $filename, 'public');
     }

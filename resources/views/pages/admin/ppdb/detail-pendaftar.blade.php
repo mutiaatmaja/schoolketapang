@@ -160,10 +160,11 @@ new class extends Component {
     </section>
 
     <div x-cloak x-show="viewerOpen" x-transition.opacity.duration.200ms
-        class="fixed inset-0 flex items-center justify-center bg-slate-900/70 px-4 py-6"
-        style="z-index: 90;" @keydown.escape.window="viewerOpen = false">
+        class="fixed inset-0 flex items-center justify-center bg-slate-900/70 px-4 py-6" style="z-index: 90;"
+        @keydown.escape.window="viewerOpen = false">
         <div class="absolute inset-0" @click="viewerOpen = false"></div>
-        <div class="relative z-10 flex max-h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-[28px] bg-white shadow-2xl">
+        <div
+            class="relative z-10 flex max-h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-[28px] bg-white shadow-2xl">
             <div class="flex items-center justify-between border-b border-outline-variant/20 px-5 py-4">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Preview Berkas</p>
@@ -175,7 +176,8 @@ new class extends Component {
             <div class="min-h-[60vh] flex-1 bg-slate-100 p-3">
                 <template x-if="viewerType === 'image'">
                     <div class="flex h-full items-center justify-center overflow-auto rounded-2xl bg-white p-4">
-                        <img :src="viewerUrl" :alt="viewerLabel" class="max-h-[72vh] w-auto max-w-full rounded-2xl object-contain">
+                        <img :src="viewerUrl" :alt="viewerLabel"
+                            class="max-h-[72vh] w-auto max-w-full rounded-2xl object-contain">
                     </div>
                 </template>
                 <template x-if="viewerType !== 'image'">

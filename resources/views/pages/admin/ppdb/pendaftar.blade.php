@@ -333,197 +333,197 @@ new class extends Component {
     @if ($showFormModal)
         <div class="fixed inset-0 flex items-center justify-center bg-slate-900/55 px-4 py-6" style="z-index: 80;">
             <div class="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-[28px] bg-white p-6 shadow-2xl">
-                    <div class="flex items-start justify-between gap-4">
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-on-surface">
+                            {{ $editingId ? 'Edit Peserta' : 'Tambah Peserta Manual' }}</h2>
+                        <p class="mt-1 text-sm text-on-surface-variant">Form ini menggunakan data yang sama dengan
+                            pendaftaran publik.</p>
+                    </div>
+                    <button type="button" wire:click="closeModal"
+                        class="rounded-full bg-surface-container p-2 text-on-surface-variant">✕</button>
+                </div>
+
+                <form wire:submit="save" class="mt-6 space-y-6">
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div>
-                            <h2 class="text-xl font-bold text-on-surface">
-                                {{ $editingId ? 'Edit Peserta' : 'Tambah Peserta Manual' }}</h2>
-                            <p class="mt-1 text-sm text-on-surface-variant">Form ini menggunakan data yang sama dengan
-                                pendaftaran publik.</p>
+                            <label class="mb-2 block text-sm font-semibold text-on-surface">Nama lengkap</label>
+                            <input type="text" wire:model.live.blur="name"
+                                class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
+                            @error('name')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
-                        <button type="button" wire:click="closeModal"
-                            class="rounded-full bg-surface-container p-2 text-on-surface-variant">✕</button>
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-on-surface">NIK</label>
+                            <input type="text" inputmode="numeric" wire:model.live.blur="nik"
+                                class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
+                            @error('nik')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-on-surface">Tempat lahir</label>
+                            <input type="text" wire:model.live.blur="birthPlace"
+                                class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
+                            @error('birthPlace')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-on-surface">Tanggal lahir</label>
+                            <input type="date" wire:model.live.blur="birthDate"
+                                class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
+                            @error('birthDate')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-on-surface">No. KK</label>
+                            <input type="text" inputmode="numeric" wire:model.live.blur="familyCardNumber"
+                                class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
+                            @error('familyCardNumber')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-on-surface">Jenis kelamin</label>
+                            <select wire:model.live="gender"
+                                class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
+                                <option value="Laki-laki">Laki-laki</option>
+                                <option value="Perempuan">Perempuan</option>
+                            </select>
+                            @error('gender')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-on-surface">Agama</label>
+                            <select wire:model.live="religion"
+                                class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
+                                <option value="Islam">Islam</option>
+                                <option value="Kristen">Kristen</option>
+                                <option value="Katolik">Katolik</option>
+                                <option value="Hindu">Hindu</option>
+                                <option value="Buddha">Buddha</option>
+                                <option value="Konghucu">Konghucu</option>
+                            </select>
+                            @error('religion')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-on-surface">Status</label>
+                            <select wire:model.live="status"
+                                class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
+                                <option value="submitted">Submitted</option>
+                                <option value="verified">Verified</option>
+                                <option value="lulus">Lulus</option>
+                                <option value="cadangan">Cadangan</option>
+                                <option value="ditolak">Ditolak</option>
+                            </select>
+                            @error('status')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-on-surface">Nama ayah</label>
+                            <input type="text" wire:model.live.blur="fatherName"
+                                class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
+                            @error('fatherName')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-on-surface">Nama ibu</label>
+                            <input type="text" wire:model.live.blur="motherName"
+                                class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
+                            @error('motherName')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-on-surface">Pekerjaan ayah</label>
+                            <input type="text" wire:model.live.blur="fatherOccupation"
+                                class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
+                            @error('fatherOccupation')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-on-surface">Pekerjaan ibu</label>
+                            <input type="text" wire:model.live.blur="motherOccupation"
+                                class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
+                            @error('motherOccupation')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-on-surface">No. HP ayah / wali</label>
+                            <input type="text" wire:model.live.blur="fatherPhone"
+                                class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
+                            @error('fatherPhone')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-on-surface">No. HP ibu</label>
+                            <input type="text" wire:model.live.blur="motherPhone"
+                                class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
+                            @error('motherPhone')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
 
-                    <form wire:submit="save" class="mt-6 space-y-6">
-                        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                            <div>
-                                <label class="mb-2 block text-sm font-semibold text-on-surface">Nama lengkap</label>
-                                <input type="text" wire:model.live.blur="name"
-                                    class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
-                                @error('name')
-                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div>
-                                <label class="mb-2 block text-sm font-semibold text-on-surface">NIK</label>
-                                <input type="text" inputmode="numeric" wire:model.live.blur="nik"
-                                    class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
-                                @error('nik')
-                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div>
-                                <label class="mb-2 block text-sm font-semibold text-on-surface">Tempat lahir</label>
-                                <input type="text" wire:model.live.blur="birthPlace"
-                                    class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
-                                @error('birthPlace')
-                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div>
-                                <label class="mb-2 block text-sm font-semibold text-on-surface">Tanggal lahir</label>
-                                <input type="date" wire:model.live.blur="birthDate"
-                                    class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
-                                @error('birthDate')
-                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div>
-                                <label class="mb-2 block text-sm font-semibold text-on-surface">No. KK</label>
-                                <input type="text" inputmode="numeric" wire:model.live.blur="familyCardNumber"
-                                    class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
-                                @error('familyCardNumber')
-                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div>
-                                <label class="mb-2 block text-sm font-semibold text-on-surface">Jenis kelamin</label>
-                                <select wire:model.live="gender"
-                                    class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
-                                    <option value="Laki-laki">Laki-laki</option>
-                                    <option value="Perempuan">Perempuan</option>
-                                </select>
-                                @error('gender')
-                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div>
-                                <label class="mb-2 block text-sm font-semibold text-on-surface">Agama</label>
-                                <select wire:model.live="religion"
-                                    class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
-                                    <option value="Islam">Islam</option>
-                                    <option value="Kristen">Kristen</option>
-                                    <option value="Katolik">Katolik</option>
-                                    <option value="Hindu">Hindu</option>
-                                    <option value="Buddha">Buddha</option>
-                                    <option value="Konghucu">Konghucu</option>
-                                </select>
-                                @error('religion')
-                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div>
-                                <label class="mb-2 block text-sm font-semibold text-on-surface">Status</label>
-                                <select wire:model.live="status"
-                                    class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
-                                    <option value="submitted">Submitted</option>
-                                    <option value="verified">Verified</option>
-                                    <option value="lulus">Lulus</option>
-                                    <option value="cadangan">Cadangan</option>
-                                    <option value="ditolak">Ditolak</option>
-                                </select>
-                                @error('status')
-                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div>
-                                <label class="mb-2 block text-sm font-semibold text-on-surface">Nama ayah</label>
-                                <input type="text" wire:model.live.blur="fatherName"
-                                    class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
-                                @error('fatherName')
-                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div>
-                                <label class="mb-2 block text-sm font-semibold text-on-surface">Nama ibu</label>
-                                <input type="text" wire:model.live.blur="motherName"
-                                    class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
-                                @error('motherName')
-                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div>
-                                <label class="mb-2 block text-sm font-semibold text-on-surface">Pekerjaan ayah</label>
-                                <input type="text" wire:model.live.blur="fatherOccupation"
-                                    class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
-                                @error('fatherOccupation')
-                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div>
-                                <label class="mb-2 block text-sm font-semibold text-on-surface">Pekerjaan ibu</label>
-                                <input type="text" wire:model.live.blur="motherOccupation"
-                                    class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
-                                @error('motherOccupation')
-                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div>
-                                <label class="mb-2 block text-sm font-semibold text-on-surface">No. HP ayah / wali</label>
-                                <input type="text" wire:model.live.blur="fatherPhone"
-                                    class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
-                                @error('fatherPhone')
-                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div>
-                                <label class="mb-2 block text-sm font-semibold text-on-surface">No. HP ibu</label>
-                                <input type="text" wire:model.live.blur="motherPhone"
-                                    class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
-                                @error('motherPhone')
-                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-                        </div>
+                    <div>
+                        <label class="mb-2 block text-sm font-semibold text-on-surface">Alamat</label>
+                        <textarea rows="4" wire:model.live.blur="address"
+                            class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10"></textarea>
+                        @error('address')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                        <div>
-                            <label class="mb-2 block text-sm font-semibold text-on-surface">Alamat</label>
-                            <textarea rows="4" wire:model.live.blur="address"
-                                class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10"></textarea>
-                            @error('address')
-                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
+                    <div>
+                        <label class="mb-2 block text-sm font-semibold text-on-surface">Catatan</label>
+                        <textarea rows="3" wire:model.live.blur="notes"
+                            class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10"></textarea>
+                        @error('notes')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                        <div>
-                            <label class="mb-2 block text-sm font-semibold text-on-surface">Catatan</label>
-                            <textarea rows="3" wire:model.live.blur="notes"
-                                class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10"></textarea>
-                            @error('notes')
-                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
-                            <button type="button" wire:click="closeModal"
-                                class="rounded-2xl border border-outline-variant/30 px-4 py-3 text-sm font-semibold text-on-surface-variant">Batal</button>
-                            <button type="submit" wire:loading.attr="disabled" wire:target="save"
-                                class="rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white disabled:opacity-60">
-                                <span wire:loading.remove wire:target="save">Simpan</span>
-                                <span wire:loading wire:target="save">Menyimpan...</span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                    <div class="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
+                        <button type="button" wire:click="closeModal"
+                            class="rounded-2xl border border-outline-variant/30 px-4 py-3 text-sm font-semibold text-on-surface-variant">Batal</button>
+                        <button type="submit" wire:loading.attr="disabled" wire:target="save"
+                            class="rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white disabled:opacity-60">
+                            <span wire:loading.remove wire:target="save">Simpan</span>
+                            <span wire:loading wire:target="save">Menyimpan...</span>
+                        </button>
+                    </div>
+                </form>
             </div>
+        </div>
     @endif
 
     @if ($showDeleteModal)
         <div class="fixed inset-0 flex items-center justify-center bg-slate-900/55 px-4 py-6" style="z-index: 80;">
             <div class="w-full max-w-md rounded-[28px] bg-white p-6 shadow-2xl">
-                    <h2 class="text-xl font-bold text-on-surface">Hapus peserta?</h2>
-                    <p class="mt-2 text-sm text-on-surface-variant">Peserta yang dihapus akan hilang dari daftar SPMB
-                        admin.</p>
-                    <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                        <button type="button" wire:click="closeModal"
-                            class="rounded-2xl border border-outline-variant/30 px-4 py-3 text-sm font-semibold text-on-surface-variant">Batal</button>
-                        <button type="button" wire:click="delete" wire:loading.attr="disabled" wire:target="delete"
-                            class="rounded-2xl bg-red-600 px-4 py-3 text-sm font-semibold text-white disabled:opacity-60">
-                            <span wire:loading.remove wire:target="delete">Ya, Hapus</span>
-                            <span wire:loading wire:target="delete">Menghapus...</span>
-                        </button>
-                    </div>
+                <h2 class="text-xl font-bold text-on-surface">Hapus peserta?</h2>
+                <p class="mt-2 text-sm text-on-surface-variant">Peserta yang dihapus akan hilang dari daftar SPMB
+                    admin.</p>
+                <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                    <button type="button" wire:click="closeModal"
+                        class="rounded-2xl border border-outline-variant/30 px-4 py-3 text-sm font-semibold text-on-surface-variant">Batal</button>
+                    <button type="button" wire:click="delete" wire:loading.attr="disabled" wire:target="delete"
+                        class="rounded-2xl bg-red-600 px-4 py-3 text-sm font-semibold text-white disabled:opacity-60">
+                        <span wire:loading.remove wire:target="delete">Ya, Hapus</span>
+                        <span wire:loading wire:target="delete">Menghapus...</span>
+                    </button>
                 </div>
             </div>
-        @endif
+        </div>
+    @endif
 </div>
