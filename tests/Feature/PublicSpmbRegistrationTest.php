@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Role;
 use App\Models\SpmbRegistration;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -18,18 +20,52 @@ class PublicSpmbRegistrationTest extends TestCase
         $response = $this->get(route('ppdb.informasi'));
 
         $response->assertStatus(200);
-        $response->assertSee('Pendaftaran murid baru', false);
+        $response->assertSee('Buat akun orang tua', false);
     }
 
-    public function test_public_user_can_submit_spmb_registration_with_documents(): void
+    public function test_guest_can_register_parent_account_and_is_redirected_to_spmb_form(): void
+    {
+        $response = $this->post(route('ppdb.register.store'), [
+            'name' => 'Orang Tua Nadia',
+            'email' => 'ortu.nadia@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ]);
+
+        $response->assertRedirect(route('ppdb.daftar'));
+        $this->assertAuthenticated();
+
+        $user = User::query()->where('email', 'ortu.nadia@example.com')->firstOrFail();
+
+        $this->assertTrue($user->hasRole('orang_tua'));
+    }
+
+    public function test_guest_must_login_before_accessing_spmb_form(): void
+    {
+        $response = $this->get(route('ppdb.daftar'));
+
+        $response->assertRedirect(route('login'));
+    }
+
+    public function test_authenticated_parent_can_submit_spmb_registration_with_documents(): void
     {
         Storage::fake('public');
 
-        Livewire::test('pages::ppdb.daftar')
-            ->set('classLevel', '1')
+        $parentRole = Role::query()->create([
+            'name' => 'orang_tua',
+            'display_name' => 'Orang Tua',
+            'description' => 'Akun orang tua untuk mengelola pendaftaran SPMB.',
+        ]);
+
+        $user = User::factory()->create([
+            'email' => 'ortu@example.com',
+        ]);
+
+        $user->syncRoles([$parentRole->name]);
+
+        Livewire::actingAs($user)
+            ->test('pages::ppdb.daftar')
             ->set('name', 'Nadia Putri')
-            ->set('nis', '')
-            ->set('nisn', '1234567890')
             ->set('birthPlace', 'Ketapang')
             ->set('birthDate', '2019-05-10')
             ->set('nik', '3173000000001111')
@@ -53,14 +89,14 @@ class PublicSpmbRegistrationTest extends TestCase
 
         $registration = SpmbRegistration::query()->firstOrFail();
 
-        $this->assertSame('1', $registration->class_level);
+        $this->assertSame($user->id, $registration->user_id);
         $this->assertSame('Nadia Putri', $registration->name);
         $this->assertSame('submitted', $registration->status);
         $this->assertNotNull($registration->submitted_at);
 
-        Storage::disk('public')->assertExists($registration->birth_certificate_path);
-        Storage::disk('public')->assertExists($registration->family_card_path);
-        Storage::disk('public')->assertExists($registration->student_photo_path);
-        Storage::disk('public')->assertExists($registration->kindergarten_certificate_path);
+        $this->assertTrue(Storage::disk('public')->exists($registration->birth_certificate_path));
+        $this->assertTrue(Storage::disk('public')->exists($registration->family_card_path));
+        $this->assertTrue(Storage::disk('public')->exists($registration->student_photo_path));
+        $this->assertTrue(Storage::disk('public')->exists($registration->kindergarten_certificate_path));
     }
 }

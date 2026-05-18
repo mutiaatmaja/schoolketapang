@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -12,6 +13,14 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
+        $middleware->redirectGuestsTo(fn () => route('login'));
+        $middleware->redirectUsersTo(function (Request $request): string {
+            if ($request->user()?->hasRole(['superadmin', 'admin'])) {
+                return route('admin.dashboard');
+            }
+
+            return route('ppdb.daftar');
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

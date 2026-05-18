@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\SpmbRegistration;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,11 +19,9 @@ class SpmbRegistrationFactory extends Factory
     public function definition(): array
     {
         return [
+            'user_id' => User::factory(),
             'registration_number' => 'SPMB-'.now()->format('Y').'-'.fake()->unique()->numerify('####'),
-            'class_level' => fake()->randomElement(['1', '2', '3', '4', '5', '6']),
             'name' => fake()->name(),
-            'nis' => fake()->boolean(40) ? fake()->numerify('#######') : null,
-            'nisn' => fake()->boolean(60) ? fake()->numerify('##########') : null,
             'birth_place' => fake()->city(),
             'birth_date' => fake()->dateTimeBetween('-12 years', '-5 years')->format('Y-m-d'),
             'nik' => fake()->unique()->numerify('################'),

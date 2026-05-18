@@ -15,6 +15,8 @@ Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function () 
     Route::livewire('/publik/prestasi', 'pages::admin.publik.prestasi')->name('publik.prestasi');
     Route::livewire('/ppdb', 'pages::admin.ppdb.index')->name('ppdb.index');
     Route::livewire('/ppdb/pendaftar', 'pages::admin.ppdb.pendaftar')->name('ppdb.pendaftar');
+    Route::livewire('/ppdb/akun-orang-tua', 'pages::admin.ppdb.akun-orang-tua')->name('ppdb.orang-tua');
+    Route::livewire('/ppdb/akun-orang-tua/{user}', 'pages::admin.ppdb.detail-orang-tua')->name('ppdb.orang-tua.show');
     Route::livewire('/ppdb/belum-validasi', 'pages::admin.ppdb.belum-validasi')->name('ppdb.belum-validasi');
     Route::livewire('/ppdb/lulus', 'pages::admin.ppdb.lulus')->name('ppdb.lulus');
     Route::livewire('/ppdb/cadangan', 'pages::admin.ppdb.cadangan')->name('ppdb.cadangan');

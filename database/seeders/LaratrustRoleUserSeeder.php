@@ -29,6 +29,11 @@ class LaratrustRoleUserSeeder extends Seeder
                 'display_name' => 'Siswa',
                 'description' => 'Akses pengguna siswa pada fitur yang diizinkan.',
             ],
+            [
+                'name' => 'orang_tua',
+                'display_name' => 'Orang Tua',
+                'description' => 'Akun orang tua untuk mengelola pendaftaran SPMB.',
+            ],
         ];
 
         foreach ($roles as $roleData) {

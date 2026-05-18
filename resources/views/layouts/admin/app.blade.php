@@ -263,6 +263,9 @@
                     <a wire:navigate href="{{ route('admin.ppdb.pendaftar') }}"
                         class="{{ $submenuBase }} {{ request()->routeIs('admin.ppdb.pendaftar') ? $submenuActive : $submenuInactive }}">Semua
                         Peserta</a>
+                    <a wire:navigate href="{{ $to('admin.ppdb.orang-tua') }}"
+                        class="{{ $submenuBase }} {{ request()->routeIs('admin.ppdb.orang-tua') || request()->routeIs('admin.ppdb.orang-tua.show') ? $submenuActive : $submenuInactive }}">Akun
+                        Orang Tua</a>
                     <a wire:navigate href="{{ $to('admin.ppdb.belum-validasi') }}"
                         class="{{ $submenuBase }} {{ request()->routeIs('admin.ppdb.belum-validasi') ? $submenuActive : $submenuInactive }}">Belum
                         Validasi</a>

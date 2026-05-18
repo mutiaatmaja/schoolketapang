@@ -16,13 +16,11 @@ new #[Layout('layouts::ppdb.app')] class extends Component {
 
     public ?string $submittedRegistrationNumber = null;
 
-    public string $classLevel = '';
+    public ?string $submittedStudentName = null;
+
+    public ?string $submittedAtLabel = null;
 
     public string $name = '';
-
-    public string $nis = '';
-
-    public string $nisn = '';
 
     public string $birthPlace = '';
 
@@ -58,9 +56,23 @@ new #[Layout('layouts::ppdb.app')] class extends Component {
 
     public $kindergartenCertificate = null;
 
+    public function mount(): void
+    {
+        $registration = SpmbRegistration::query()
+            ->whereBelongsTo(auth()->user())
+            ->first();
+
+        if ($registration instanceof SpmbRegistration) {
+            $this->isSubmitted = true;
+            $this->submittedRegistrationNumber = $registration->registration_number;
+            $this->submittedStudentName = $registration->name;
+            $this->submittedAtLabel = optional($registration->submitted_at)->translatedFormat('d F Y, H:i');
+        }
+    }
+
     public function getStepItemsProperty(): Collection
     {
-        return collect([['number' => 1, 'label' => 'Calon siswa'], ['number' => 2, 'label' => 'Orang tua'], ['number' => 3, 'label' => 'Berkas'], ['number' => 4, 'label' => 'Review']]);
+        return collect([['number' => 1, 'label' => 'Siswa'], ['number' => 2, 'label' => 'Orang tua'], ['number' => 3, 'label' => 'Berkas'], ['number' => 4, 'label' => 'Review']]);
     }
 
     public function getCompletionPercentageProperty(): int
@@ -95,11 +107,9 @@ new #[Layout('layouts::ppdb.app')] class extends Component {
         $registrationNumber = $this->generateRegistrationNumber();
 
         $record = SpmbRegistration::query()->create([
+            'user_id' => auth()->id(),
             'registration_number' => $registrationNumber,
-            'class_level' => $validated['classLevel'],
             'name' => $validated['name'],
-            'nis' => $validated['nis'] ?: null,
-            'nisn' => $validated['nisn'] ?: null,
             'birth_place' => $validated['birthPlace'],
             'birth_date' => $validated['birthDate'],
             'nik' => $validated['nik'],
@@ -122,6 +132,8 @@ new #[Layout('layouts::ppdb.app')] class extends Component {
         ]);
 
         $this->submittedRegistrationNumber = $record->registration_number;
+        $this->submittedStudentName = $record->name;
+        $this->submittedAtLabel = optional($record->submitted_at)->translatedFormat('d F Y, H:i');
         $this->isSubmitted = true;
         $this->step = 4;
 
@@ -132,10 +144,7 @@ new #[Layout('layouts::ppdb.app')] class extends Component {
     {
         return match ($step) {
             1 => [
-                'classLevel' => ['required', 'in:1,2,3,4,5,6'],
                 'name' => ['required', 'string', 'min:3', 'max:255'],
-                'nis' => ['nullable', 'string', 'max:30'],
-                'nisn' => ['nullable', 'string', 'max:30'],
                 'birthPlace' => ['required', 'string', 'max:100'],
                 'birthDate' => ['required', 'date'],
                 'nik' => ['required', 'digits:16', 'unique:spmb_registrations,nik'],
@@ -189,8 +198,9 @@ new #[Layout('layouts::ppdb.app')] class extends Component {
             <div>
                 <p class="text-xs font-semibold uppercase tracking-[0.22em] text-sky-600">Form SPMB</p>
                 <h1 class="mt-2 text-2xl font-bold leading-tight text-slate-900">Pendaftaran murid baru</h1>
-                <p class="mt-2 text-sm leading-6 text-slate-500">Form dibuat bertahap agar nyaman diisi lewat HP. Simpan
-                    berkas sebelum mulai.</p>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Anda login sebagai <span
+                        class="font-semibold text-slate-700">{{ auth()->user()->email }}</span>. Lengkapi data siswa dari
+                    akun orang tua ini.</p>
             </div>
             <a href="{{ route('ppdb.informasi') }}" wire:navigate
                 class="rounded-full bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-600">Info</a>
@@ -231,6 +241,10 @@ new #[Layout('layouts::ppdb.app')] class extends Component {
                 <p
                     class="mt-3 rounded-2xl bg-white px-4 py-3 text-center text-lg font-bold tracking-[0.18em] text-emerald-800">
                     {{ $submittedRegistrationNumber }}</p>
+                <p class="mt-3 text-sm font-semibold text-emerald-900">Calon siswa: {{ $submittedStudentName }}</p>
+                @if ($submittedAtLabel)
+                    <p class="mt-1 text-xs text-emerald-800">Dikirim pada {{ $submittedAtLabel }}</p>
+                @endif
                 <p class="mt-3 text-sm leading-6 text-emerald-800">Tim sekolah akan memverifikasi data dan berkas Anda.
                     Simpan nomor ini untuk keperluan tindak lanjut.</p>
             </div>
@@ -245,25 +259,11 @@ new #[Layout('layouts::ppdb.app')] class extends Component {
                 <div class="space-y-4">
                     <div>
                         <h2 class="text-lg font-bold text-slate-800">Step 1. Data calon siswa</h2>
-                        <p class="mt-1 text-sm text-slate-500">Isi data utama calon murid. NIS dibuat opsional karena
-                            calon siswa baru biasanya belum memiliki NIS sekolah ini.</p>
+                        <p class="mt-1 text-sm text-slate-500">Isi data utama calon murid. Kelas, NIS, dan NISN tidak
+                            diminta pada tahap pendaftaran awal.</p>
                     </div>
 
                     <div class="space-y-4">
-                        <div>
-                            <label class="text-sm font-semibold text-slate-700">Kelas yang dituju</label>
-                            <select wire:model="classLevel"
-                                class="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm">
-                                <option value="">Pilih kelas</option>
-                                @foreach (['1', '2', '3', '4', '5', '6'] as $level)
-                                    <option value="{{ $level }}">Kelas {{ $level }}</option>
-                                @endforeach
-                            </select>
-                            @error('classLevel')
-                                <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
                         <div>
                             <label class="text-sm font-semibold text-slate-700">Nama siswa</label>
                             <input type="text" wire:model.blur="name"
@@ -271,27 +271,6 @@ new #[Layout('layouts::ppdb.app')] class extends Component {
                             @error('name')
                                 <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
                             @enderror
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="text-sm font-semibold text-slate-700">NIS</label>
-                                <input type="text" wire:model.blur="nis"
-                                    class="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm"
-                                    placeholder="Opsional" />
-                                @error('nis')
-                                    <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div>
-                                <label class="text-sm font-semibold text-slate-700">NISN</label>
-                                <input type="text" wire:model.blur="nisn"
-                                    class="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm"
-                                    placeholder="Opsional" />
-                                @error('nisn')
-                                    <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
-                                @enderror
-                            </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
@@ -548,8 +527,6 @@ new #[Layout('layouts::ppdb.app')] class extends Component {
                     <div class="space-y-3 rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">
                         <div class="flex items-start justify-between gap-3"><span>Nama siswa</span><strong
                                 class="text-right text-slate-800">{{ $name }}</strong></div>
-                        <div class="flex items-start justify-between gap-3"><span>Kelas tujuan</span><strong
-                                class="text-right text-slate-800">Kelas {{ $classLevel }}</strong></div>
                         <div class="flex items-start justify-between gap-3"><span>NIK</span><strong
                                 class="text-right text-slate-800">{{ $nik }}</strong></div>
                         <div class="flex items-start justify-between gap-3"><span>Tempat, tanggal lahir</span><strong
@@ -585,7 +562,7 @@ new #[Layout('layouts::ppdb.app')] class extends Component {
         </section>
 
         <section class="sticky bottom-3 z-20">
-            <div class="rounded-[24px] border border-slate-200 bg-white/95 p-3 shadow-lg backdrop-blur">
+            <div class="rounded-3xl border border-slate-200 bg-white/95 p-3 shadow-lg backdrop-blur">
                 <div class="flex gap-3">
                     @if ($step > 1)
                         <button type="button" wire:click="previousStep" wire:loading.attr="disabled"

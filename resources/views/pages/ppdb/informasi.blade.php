@@ -4,7 +4,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 new #[Layout('layouts::ppdb.app')] class extends Component {
-    public array $steps = [['title' => 'Data calon siswa', 'description' => 'Isi identitas utama calon murid secara lengkap.'], ['title' => 'Data orang tua', 'description' => 'Lengkapi nama, kontak, dan alamat keluarga.'], ['title' => 'Upload berkas', 'description' => 'Siapkan Akte, KK, foto siswa, dan ijazah TK bila ada.'], ['title' => 'Review dan kirim', 'description' => 'Periksa ulang semua data sebelum pendaftaran dikirim.']];
+    public array $steps = [['title' => 'Buat akun orang tua', 'description' => 'Daftar dengan email dan kata sandi untuk menyimpan proses pendaftaran.'], ['title' => 'Data calon siswa', 'description' => 'Isi identitas utama calon murid tanpa kelas, NIS, atau NISN.'], ['title' => 'Upload berkas', 'description' => 'Siapkan Akte, KK, foto siswa, dan ijazah TK bila ada.'], ['title' => 'Review dan kirim', 'description' => 'Periksa ulang semua data sebelum pendaftaran dikirim.']];
 
     public array $requirements = [['label' => 'Akte Lahir', 'description' => 'Wajib. Format JPG, PNG, atau PDF.'], ['label' => 'Kartu Keluarga', 'description' => 'Wajib. Format JPG, PNG, atau PDF.'], ['label' => 'Foto siswa latar merah', 'description' => 'Wajib. Format JPG atau PNG.'], ['label' => 'Ijazah TK', 'description' => 'Opsional. Upload bila tersedia.']];
 };
@@ -16,10 +16,25 @@ new #[Layout('layouts::ppdb.app')] class extends Component {
         <h1 class="mt-3 text-2xl font-bold leading-tight">Pendaftaran murid baru yang lebih ringkas untuk layar HP.</h1>
         <p class="mt-3 text-sm leading-6 text-sky-50/90">Form dibuat bertahap agar orang tua bisa fokus mengisi data satu
             per satu tanpa layar terasa penuh.</p>
-        <a href="{{ route('ppdb.daftar') }}" wire:navigate
-            class="mt-5 inline-flex w-full items-center justify-center rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-sky-700 shadow-sm">
-            Mulai Isi Formulir
-        </a>
+        <p class="mt-3 text-sm leading-6 text-sky-50/90">Alur dimulai dari akun orang tua, lalu data calon siswa diisi
+            setelah login agar proses bisa dilanjutkan kapan saja.</p>
+        @auth
+            <a href="{{ route('ppdb.daftar') }}" wire:navigate
+                class="mt-5 inline-flex w-full items-center justify-center rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-sky-700 shadow-sm">
+                Lanjutkan pendaftaran
+            </a>
+        @else
+            <div class="mt-5 flex flex-col gap-3">
+                <a href="{{ route('ppdb.register') }}"
+                    class="inline-flex w-full items-center justify-center rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-sky-700 shadow-sm">
+                    Buat akun orang tua
+                </a>
+                <a href="{{ route('login') }}"
+                    class="inline-flex w-full items-center justify-center rounded-2xl border border-white/30 bg-sky-800/40 px-4 py-3 text-sm font-semibold text-white">
+                    Masuk ke akun
+                </a>
+            </div>
+        @endauth
     </section>
 
     <section class="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm">

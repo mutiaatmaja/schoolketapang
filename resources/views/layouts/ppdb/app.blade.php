@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>SPMB Online - {{ config('app.name', 'Sekolah SD') }}</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
         [x-cloak] {
             display: none !important;
@@ -15,7 +16,7 @@
 
 <body class="min-h-screen bg-slate-100 text-slate-900 antialiased">
     <div
-        class="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.16),_transparent_42%),linear-gradient(180deg,_#eff6ff_0%,_#f8fafc_24%,_#f8fafc_100%)]">
+        class="min-h-screen bg-[radial-gradient(circle_at_top,rgba(14,165,233,0.16),transparent_42%),linear-gradient(180deg,#eff6ff_0%,#f8fafc_24%,#f8fafc_100%)]">
         <header class="sticky top-0 z-30 border-b border-sky-100 bg-white/95 backdrop-blur">
             <div class="mx-auto flex max-w-md items-center justify-between px-4 py-3 sm:max-w-2xl sm:px-6">
                 <a href="{{ route('ppdb.informasi') }}" wire:navigate class="text-sm font-semibold text-sky-700">SPMB
@@ -23,6 +24,20 @@
                 <div class="flex items-center gap-2 text-xs text-slate-500">
                     <a href="{{ route('depan.beranda') }}"
                         class="rounded-full bg-slate-100 px-3 py-1.5 font-semibold text-slate-600">Beranda</a>
+                    @auth
+                        <a href="{{ route('ppdb.daftar') }}" wire:navigate
+                            class="rounded-full bg-sky-600 px-3 py-1.5 font-semibold text-white">Dashboard</a>
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit"
+                                class="rounded-full bg-slate-100 px-3 py-1.5 font-semibold text-slate-600">Keluar</button>
+                        </form>
+                    @else
+                        <a href="{{ route('login') }}"
+                            class="rounded-full bg-slate-100 px-3 py-1.5 font-semibold text-slate-600">Masuk</a>
+                        <a href="{{ route('ppdb.register') }}"
+                            class="rounded-full bg-sky-600 px-3 py-1.5 font-semibold text-white">Daftar Akun</a>
+                    @endauth
                 </div>
             </div>
         </header>
