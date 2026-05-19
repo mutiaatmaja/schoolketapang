@@ -147,28 +147,6 @@ new #[Layout('layouts::ppdb.app')] class extends Component {
 ?>
 
 <div class="space-y-6">
-    <section class="rounded-[24px] border border-[#d8e4df] bg-white p-5 shadow-sm">
-        <div class="flex items-center justify-between gap-3">
-            <h1 class="text-lg font-semibold text-slate-900">Statistik dan Cek Status SPMB</h1>
-            <span class="rounded-full bg-[#eef4f1] px-3 py-1 text-[11px] font-semibold text-[#1d4f45]">Read Only</span>
-        </div>
-        <p class="mt-2 text-xs leading-5 text-slate-500">Halaman publik untuk melihat statistik dan status pendaftaran.
-            Data sensitif disamarkan dan tidak tersedia aksi pengelolaan.</p>
-
-        <div class="mt-4 grid grid-cols-2 gap-3">
-            @foreach ($this->stats as $stat)
-                <article wire:key="stat-{{ $stat['label'] }}" class="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-                    <p class="text-[11px] uppercase tracking-wide text-slate-500">{{ $stat['label'] }}</p>
-                    <p class="mt-1 text-2xl font-bold text-slate-900">{{ $stat['value'] }}</p>
-                    @if ($stat['route'])
-                        <a href="{{ route($stat['route']) }}" wire:navigate
-                            class="mt-2 inline-flex text-xs font-semibold text-[#1d4f45] hover:underline">Lihat
-                            daftar</a>
-                    @endif
-                </article>
-            @endforeach
-        </div>
-    </section>
 
     <section class="rounded-[24px] border border-[#eadfca] bg-[#fff9ef] p-5 shadow-sm">
         <h2 class="text-base font-semibold text-slate-900">Cek Status Pendaftaran</h2>
@@ -227,6 +205,31 @@ new #[Layout('layouts::ppdb.app')] class extends Component {
             </div>
         @endif
     </section>
+    <section class="rounded-[24px] border border-[#d8e4df] bg-white p-5 shadow-sm">
+        <div class="flex items-center justify-between gap-3">
+            <h1 class="text-lg font-semibold text-slate-900">Statistik dan Cek Status SPMB</h1>
+            <span class="rounded-full bg-[#eef4f1] px-3 py-1 text-[11px] font-semibold text-[#1d4f45]">Read Only</span>
+        </div>
+        <p class="mt-2 text-xs leading-5 text-slate-500">Halaman publik untuk melihat statistik dan status pendaftaran.
+            Data sensitif disamarkan dan tidak tersedia aksi pengelolaan.</p>
+
+        <div class="mt-4 grid grid-cols-2 gap-3">
+            @foreach ($this->stats as $stat)
+                <article wire:key="stat-{{ $stat['label'] }}"
+                    class="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+                    <p class="text-[11px] uppercase tracking-wide text-slate-500">{{ $stat['label'] }}</p>
+                    <p class="mt-1 text-2xl font-bold text-slate-900">{{ $stat['value'] }}</p>
+                    @if ($stat['route'])
+                        <a href="{{ route($stat['route']) }}" wire:navigate
+                            class="mt-2 inline-flex text-xs font-semibold text-[#1d4f45] hover:underline">Lihat
+                            daftar</a>
+                    @endif
+                </article>
+            @endforeach
+        </div>
+    </section>
+
+
 
     <section class="rounded-[24px] border border-[#d8e4df] bg-white p-5 shadow-sm">
         <h2 class="text-base font-semibold text-slate-900">Lihat Daftar per Kategori</h2>
