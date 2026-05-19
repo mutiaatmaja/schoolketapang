@@ -11,8 +11,6 @@ new #[Layout('layouts::ppdb.app')] class extends Component {
 ?>
 
 <div class="space-y-6">
-
-
     <section class="grid gap-4">
         <div class="rounded-[24px] border border-[#d8e4df] bg-white p-5 shadow-sm">
             <h2 class="text-base font-semibold text-slate-900">Yang perlu disiapkan</h2>
@@ -41,18 +39,22 @@ new #[Layout('layouts::ppdb.app')] class extends Component {
             </div>
         </div>
     </section>
+
     <section class="rounded-[28px] bg-[#1d4f45] px-5 py-6 text-white shadow-lg shadow-[#1d4f45]/20">
         <p class="text-xs font-semibold uppercase tracking-[0.24em] text-white/75">SPMB SD Ketapang</p>
-        <h1 class="mt-3 text-[1.9rem] font-bold leading-tight">Pendaftaran siswa baru yang ringkas dan mudah diisi lewat
-            HP.</h1>
-        <p class="mt-3 text-sm leading-6 text-white/80">Form dibuat bertahap agar orang tua bisa fokus satu bagian dalam
-            satu waktu. Siapkan dokumen dasar sebelum mulai.</p>
-        <div class="mt-5 flex flex-col gap-3">
+        <h1 class="mt-3 text-[1.9rem] font-bold leading-tight">Lanjutkan ke Statistik dan Pendaftaran</h1>
+        <p class="mt-3 text-sm leading-6 text-white/80">Halaman statistik, cek status, dan daftar kategori dipisah agar
+            lebih ringkas.</p>
+        <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+            <a href="{{ route('ppdb.statistik') }}" wire:navigate
+                class="inline-flex items-center justify-center rounded-2xl border border-white/40 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10">
+                Buka Statistik SPMB
+            </a>
             <a href="{{ route('ppdb.daftar') }}" wire:navigate
                 class="inline-flex items-center justify-center rounded-2xl bg-[#f6c453] px-4 py-3 text-sm font-semibold text-[#18352f] transition hover:bg-[#f0ba3a]">
                 Mulai Pendaftaran
             </a>
-            <p class="text-xs text-white/70">Tidak perlu memilih kelas, NIS, atau NISN saat daftar awal.</p>
         </div>
+        <p class="mt-3 text-xs text-white/70">Tidak perlu memilih kelas, NIS, atau NISN saat daftar awal.</p>
     </section>
 </div>

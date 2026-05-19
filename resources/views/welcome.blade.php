@@ -168,7 +168,7 @@
                 <a class="text-on-surface-variant font-medium font-label-md text-label-md hover:text-primary transition-colors duration-200"
                     href="#kontak">Kontak</a>
                 <a class="bg-secondary-container text-on-secondary-container font-label-md text-label-md px-5 py-2 rounded-full hover:opacity-90 transition-all"
-                    href="{{ route('ppdb.informasi') }}">Daftar SPMB</a>
+                    href="{{ route('ppdb.statistik') }}">Daftar SPMB</a>
                 @auth
                     <a class="bg-primary text-on-primary font-label-md text-label-md px-5 py-2 rounded-full hover:opacity-90 transition-all"
                         href="{{ route('admin.dashboard') }}">Dashboard</a>
@@ -206,7 +206,7 @@
                     href="#kontak" @click="mobileMenuOpen = false">Kontak</a>
                 <div class="border-t border-surface-variant pt-4 mt-2 flex flex-col gap-2">
                     <a class="bg-secondary-container text-on-secondary-container font-label-md text-label-md px-5 py-2 rounded-full hover:opacity-90 transition-all text-center"
-                        href="{{ route('ppdb.informasi') }}" @click="mobileMenuOpen = false">Daftar SPMB</a>
+                        href="{{ route('ppdb.statistik') }}" @click="mobileMenuOpen = false">Daftar SPMB</a>
                     @auth
                         <a class="bg-primary text-on-primary font-label-md text-label-md px-5 py-2 rounded-full hover:opacity-90 transition-all text-center"
                             href="{{ route('admin.dashboard') }}" @click="mobileMenuOpen = false">Dashboard</a>
@@ -239,7 +239,7 @@
                 Sekolah</span>
             <h1 class="text-white font-headline-xl text-headline-xl md:text-headline-xl mb-8">{{ $schoolMotto }}</h1>
             <div class="flex flex-col md:flex-row gap-4 justify-center">
-                <a href="{{ route('ppdb.informasi') }}"
+                <a href="{{ route('ppdb.statistik') }}"
                     class="inline-block bg-primary text-on-primary font-label-md text-label-md px-10 py-4 rounded-3xl shadow-lg hover:opacity-90 transition-all">Daftar
                     Sekarang</a>
                 <a href="#statistik"
@@ -261,21 +261,27 @@
                 class="bg-surface-container-lowest p-10 rounded-3xl shadow-[0_4px_20px_rgba(30,64,175,0.08)] flex flex-col items-center text-center border-b-4 border-secondary">
                 <span class="material-symbols-outlined text-secondary text-5xl mb-4"
                     style="font-variation-settings: 'FILL' 1;">person</span>
-                <div class="font-stats-number text-stats-number text-primary mb-2">45</div>
+                <div class="font-stats-number text-stats-number text-primary mb-2">
+                    {{ number_format($teacherCount, 0, ',', '.') }}
+                </div>
                 <div class="font-label-md text-label-md text-on-surface-variant">Jumlah Guru</div>
             </div>
             <div
                 class="bg-surface-container-lowest p-10 rounded-3xl shadow-[0_4px_20px_rgba(30,64,175,0.08)] flex flex-col items-center text-center border-b-4 border-primary">
                 <span class="material-symbols-outlined text-primary text-5xl mb-4"
                     style="font-variation-settings: 'FILL' 1;">groups</span>
-                <div class="font-stats-number text-stats-number text-primary mb-2">850</div>
+                <div class="font-stats-number text-stats-number text-primary mb-2">
+                    {{ number_format($studentCount, 0, ',', '.') }}
+                </div>
                 <div class="font-label-md text-label-md text-on-surface-variant">Jumlah Siswa</div>
             </div>
             <div
                 class="bg-surface-container-lowest p-10 rounded-3xl shadow-[0_4px_20px_rgba(30,64,175,0.08)] flex flex-col items-center text-center border-b-4 border-secondary">
                 <span class="material-symbols-outlined text-secondary text-5xl mb-4"
                     style="font-variation-settings: 'FILL' 1;">military_tech</span>
-                <div class="font-stats-number text-stats-number text-primary mb-2">120</div>
+                <div class="font-stats-number text-stats-number text-primary mb-2">
+                    {{ number_format($achievementCount, 0, ',', '.') }}
+                </div>
                 <div class="font-label-md text-label-md text-on-surface-variant">Jumlah Prestasi</div>
             </div>
         </div>
@@ -530,7 +536,7 @@
                     <li><a class="hover:text-secondary transition-all" href="#">Kurikulum</a></li>
                     <li><a class="hover:text-secondary transition-all" href="#">Fasilitas</a></li>
                     <li><a class="hover:text-secondary transition-all"
-                            href="{{ route('ppdb.informasi') }}">Pendaftaran SPMB</a></li>
+                            href="{{ route('ppdb.statistik') }}">Pendaftaran SPMB</a></li>
                     <li><a class="hover:text-secondary transition-all" href="#">Ekstrakurikuler</a></li>
                 </ul>
             </div>

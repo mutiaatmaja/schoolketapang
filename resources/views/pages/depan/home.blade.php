@@ -26,8 +26,8 @@ new class extends Component {
 
     public function openPpdb(): void
     {
-        $this->dispatch('toast', type: 'info', message: 'Membuka halaman informasi SPMB...');
-        $this->redirectRoute('ppdb.informasi', navigate: true);
+        $this->dispatch('toast', type: 'info', message: 'Membuka halaman statistik SPMB...');
+        $this->redirectRoute('ppdb.statistik', navigate: true);
     }
 };
 ?>

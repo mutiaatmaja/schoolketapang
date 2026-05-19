@@ -259,9 +259,9 @@ new #[Layout('layouts::ppdb.app')] class extends Component {
                     class="inline-flex items-center justify-center rounded-2xl bg-[#18352f] px-4 py-3 text-sm font-semibold text-white">
                     Cetak PDF Rekap Pendaftaran
                 </a>
-                <a href="{{ route('ppdb.informasi') }}" wire:navigate
+                <a href="{{ route('ppdb.statistik') }}" wire:navigate
                     class="inline-flex items-center justify-center rounded-2xl bg-[#1d4f45] px-4 py-3 text-sm font-semibold text-white">
-                    Kembali ke informasi SPMB
+                    Kembali ke statistik SPMB
                 </a>
             </div>
         </section>

@@ -38,7 +38,10 @@ class SpmbRegistrationFactory extends Factory
             'family_card_path' => 'spmb/family-cards/sample.pdf',
             'student_photo_path' => 'spmb/student-photos/sample.jpg',
             'kindergarten_certificate_path' => 'spmb/kindergarten-certificates/sample.pdf',
-            'status' => fake()->randomElement(['submitted', 'verified', 'rejected']),
+            'status' => fake()->randomElement(['submitted', 'verified', 'lulus', 'cadangan', 'ditolak']),
+            'validated_by_user_id' => null,
+            'validation_note' => null,
+            'validated_at' => null,
             'submitted_at' => now(),
         ];
     }

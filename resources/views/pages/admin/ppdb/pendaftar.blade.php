@@ -9,6 +9,8 @@ use Livewire\Component;
 new class extends Component {
     public string $search = '';
 
+    public string $sortBy = 'latest';
+
     public ?int $editingId = null;
 
     public ?int $deletingId = null;
@@ -80,7 +82,7 @@ new class extends Component {
 
     public function getApplicantsProperty(): Collection
     {
-        return SpmbRegistration::query()
+        $applicants = SpmbRegistration::query()
             ->when($this->search !== '', function ($query): void {
                 $query->where(function ($innerQuery): void {
                     $innerQuery
@@ -94,6 +96,12 @@ new class extends Component {
             ->orderByDesc('submitted_at')
             ->orderByDesc('id')
             ->get();
+
+        return match ($this->sortBy) {
+            'age_oldest' => $applicants->sortByDesc(fn(SpmbRegistration $registration): int => $registration->ageAtRegistrationDays() ?? -1)->values(),
+            'age_youngest' => $applicants->sortBy(fn(SpmbRegistration $registration): int => $registration->ageAtRegistrationDays() ?? PHP_INT_MAX)->values(),
+            default => $applicants,
+        };
     }
 
     public function openCreate(): void
@@ -247,17 +255,29 @@ new class extends Component {
     </section>
 
     <section class="rounded-[28px] border border-outline-variant/20 bg-white p-6 shadow-sm">
-        <div class="relative max-w-md">
-            <input type="text" wire:model.live.debounce.300ms="search"
-                placeholder="Cari nomor, nama, NIK, No. KK, atau status"
-                class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 pr-12 text-sm text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
-            <div wire:loading wire:target="search" class="absolute inset-y-0 right-4 flex items-center">
-                <span class="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent"></span>
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div class="relative max-w-md flex-1">
+                <input type="text" wire:model.live.debounce.300ms="search"
+                    placeholder="Cari nomor, nama, NIK, No. KK, atau status"
+                    class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 pr-12 text-sm text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
+                <div wire:loading wire:target="search" class="absolute inset-y-0 right-4 flex items-center">
+                    <span class="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent"></span>
+                </div>
+            </div>
+
+            <div class="w-full lg:w-64">
+                <label class="mb-2 block text-sm font-semibold text-on-surface">Urutkan Peserta</label>
+                <select wire:model.live="sortBy"
+                    class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
+                    <option value="latest">Pendaftaran Terbaru</option>
+                    <option value="age_oldest">Umur Tertua</option>
+                    <option value="age_youngest">Umur Termuda</option>
+                </select>
             </div>
         </div>
 
         <div class="relative mt-6 overflow-hidden rounded-3xl border border-outline-variant/20">
-            <div wire:loading wire:target="search, save, delete, openEdit, confirmDelete"
+            <div wire:loading wire:target="search, sortBy, save, delete, openEdit, confirmDelete"
                 class="absolute inset-0 z-10 flex items-center justify-center bg-white/80 backdrop-blur-sm">
                 <div
                     class="flex items-center gap-3 rounded-full bg-white px-4 py-2 text-sm font-semibold text-on-surface shadow-lg">
@@ -273,6 +293,7 @@ new class extends Component {
                             <th class="px-5 py-4 font-semibold">Nomor</th>
                             <th class="px-5 py-4 font-semibold">Nama</th>
                             <th class="px-5 py-4 font-semibold">NIK</th>
+                            <th class="px-5 py-4 font-semibold">Umur</th>
                             <th class="px-5 py-4 font-semibold">Status</th>
                             <th class="px-5 py-4 font-semibold text-right">Aksi</th>
                         </tr>
@@ -288,6 +309,11 @@ new class extends Component {
                                         {{ $applicant->submitted_at?->format('d M Y H:i') ?? '-' }}</p>
                                 </td>
                                 <td class="px-5 py-4 text-on-surface-variant">{{ $applicant->nik }}</td>
+                                <td class="px-5 py-4 text-on-surface-variant">
+                                    <span
+                                        class="font-semibold text-on-surface">{{ $applicant->ageAtRegistrationLabel() }}</span>
+                                    <p class="mt-1 text-xs text-on-surface-variant">Saat daftar</p>
+                                </td>
                                 <td class="px-5 py-4">
                                     <span
                                         class="rounded-full px-3 py-1 text-xs font-semibold {{ $statusStyles[$applicant->status] ?? 'bg-slate-100 text-slate-700' }}">
@@ -320,7 +346,7 @@ new class extends Component {
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-5 py-10 text-center text-sm text-on-surface-variant">Belum
+                                <td colspan="6" class="px-5 py-10 text-center text-sm text-on-surface-variant">Belum
                                     ada peserta yang sesuai pencarian.</td>
                             </tr>
                         @endforelse

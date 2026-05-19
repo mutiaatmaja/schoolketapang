@@ -41,6 +41,83 @@
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
             vertical-align: middle
         }
+
+        .article-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 1rem;
+            margin: 1.5rem 0;
+            display: block;
+        }
+
+        .article-content h1,
+        .article-content h2,
+        .article-content h3,
+        .article-content h4,
+        .article-content h5,
+        .article-content h6 {
+            font-family: Quicksand, sans-serif;
+            color: #0f172a;
+            font-weight: 700;
+            line-height: 1.25;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .article-content h2 {
+            font-size: 1.75rem;
+        }
+
+        .article-content h3 {
+            font-size: 1.375rem;
+        }
+
+        .article-content p,
+        .article-content ul,
+        .article-content ol,
+        .article-content blockquote,
+        .article-content table {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .article-content ul,
+        .article-content ol {
+            padding-left: 1.5rem;
+        }
+
+        .article-content ul {
+            list-style: disc;
+        }
+
+        .article-content ol {
+            list-style: decimal;
+        }
+
+        .article-content a {
+            color: #1e40af;
+            text-decoration: underline;
+        }
+
+        .article-content blockquote {
+            border-left: 4px solid #ffc329;
+            padding-left: 1rem;
+            color: #475569;
+            font-style: italic;
+        }
+
+        .article-content table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 1rem;
+        }
+
+        .article-content th,
+        .article-content td {
+            border: 1px solid #e2e8f0;
+            padding: 0.75rem;
+        }
     </style>
 </head>
 
@@ -52,7 +129,7 @@
                     <span class="material-symbols-outlined text-[20px]">school</span>
                 </span>
                 <div>
-                    <p class="font-headline text-lg font-bold text-primary">Elementary School</p>
+                    <p class="font-headline text-lg font-bold text-primary">{{ $schoolName ?? 'Nama Sekolah' }}</p>
                     <p class="text-xs text-on-surface-variant">Berita Sekolah</p>
                 </div>
             </a>
@@ -94,7 +171,7 @@
                     <div class="rounded-3xl bg-white/10 p-5 backdrop-blur">
                         <p class="text-xs font-bold uppercase tracking-[0.24em] text-white/70">Ringkasan</p>
                         <ul class="mt-4 space-y-3 text-sm leading-6 text-white/90">
-                            @foreach ($article['content'] as $paragraph)
+                            @foreach ($article['summaryPoints'] as $paragraph)
                                 <li class="flex gap-3">
                                     <span class="mt-2 h-2 w-2 shrink-0 rounded-full bg-secondary-container"></span>
                                     <span>{{ $paragraph }}</span>
@@ -108,10 +185,8 @@
 
         <section class="mt-8 grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
             <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-                <div class="space-y-5 text-base leading-8 text-slate-700">
-                    @foreach ($article['content'] as $paragraph)
-                        <p>{{ $paragraph }}</p>
-                    @endforeach
+                <div class="article-content text-base leading-8 text-slate-700">
+                    {!! $article['content'] !!}
                 </div>
 
                 <div class="mt-8 rounded-2xl bg-slate-50 p-5">
@@ -155,7 +230,7 @@
                         <p class="text-xs font-bold uppercase tracking-[0.24em] text-secondary">Berita lain</p>
                         <div class="mt-4 space-y-4">
                             @foreach ($relatedArticles as $relatedArticle)
-                                <a href="{{ route('berita.show', $relatedArticle['slug']) }}"
+                                <a href="{{ route('berita.show', ['slug' => $relatedArticle['slug']]) }}"
                                     class="block rounded-2xl border border-slate-200 p-4 transition hover:border-primary hover:bg-slate-50">
                                     <p class="text-sm font-semibold text-slate-800">{{ $relatedArticle['title'] }}</p>
                                     <p class="mt-1 text-xs text-slate-500">{{ $relatedArticle['date'] }}</p>

@@ -1,15 +1,45 @@
 <?php
 
 use App\Models\SpmbRegistration;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 
 new class extends Component {
     public SpmbRegistration $registration;
 
+    public string $validationStatus = 'submitted';
+
+    public string $validationNote = '';
+
     public function mount(SpmbRegistration $registration): void
     {
-        $this->registration = $registration;
+        $this->registration = $registration->loadMissing('validator');
+        $this->validationStatus = $this->registration->status;
+        $this->validationNote = $this->registration->validation_note ?? '';
+    }
+
+    public function saveValidation(): void
+    {
+        $validated = $this->validate([
+            'validationStatus' => ['required', 'in:submitted,verified,lulus,cadangan,ditolak'],
+            'validationNote' => [Rule::requiredIf(fn(): bool => $this->validationStatus !== 'submitted'), 'nullable', 'string', 'max:1000'],
+        ]);
+
+        $isPendingValidation = $validated['validationStatus'] === 'submitted';
+
+        $this->registration->update([
+            'status' => $validated['validationStatus'],
+            'validation_note' => $isPendingValidation ? null : ($validated['validationNote'] ?: null),
+            'validated_by_user_id' => $isPendingValidation ? null : auth()->id(),
+            'validated_at' => $isPendingValidation ? null : now(),
+        ]);
+
+        $this->registration->refresh()->loadMissing('validator');
+        $this->validationStatus = $this->registration->status;
+        $this->validationNote = $this->registration->validation_note ?? '';
+
+        $this->dispatch('toast', type: 'success', message: 'Status validasi peserta berhasil diperbarui.');
     }
 };
 ?>
@@ -87,6 +117,12 @@ new class extends Component {
                     <p class="mt-2 text-sm font-semibold text-on-surface">{{ str($registration->status)->headline() }}
                     </p>
                 </div>
+                <div class="rounded-2xl bg-surface-container-low p-4 md:col-span-2">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-on-surface-variant">Umur Saat
+                        Pendaftaran</p>
+                    <p class="mt-2 text-sm font-semibold text-on-surface">{{ $registration->ageAtRegistrationLabel() }}
+                    </p>
+                </div>
             </div>
 
             <div class="mt-4 rounded-2xl bg-surface-container-low p-4">
@@ -119,6 +155,50 @@ new class extends Component {
                     <p class="mt-1 text-on-surface">{{ $registration->mother_phone ?: 'Nomor HP belum diisi' }}</p>
                 </div>
             </div>
+        </article>
+
+        <article class="rounded-[28px] border border-outline-variant/20 bg-white p-6 shadow-sm">
+            <h2 class="text-lg font-bold text-on-surface">Validasi Admin</h2>
+
+            <div class="mt-4 rounded-2xl bg-surface-container-low p-4 text-sm">
+                <p class="text-xs font-semibold uppercase tracking-wide text-on-surface-variant">Divalidasi oleh</p>
+                <p class="mt-1 font-semibold text-on-surface">{{ $registration->validator?->name ?? '-' }}</p>
+                <p class="mt-2 text-xs text-on-surface-variant">Waktu validasi:
+                    {{ $registration->validated_at?->format('d M Y H:i') ?? '-' }}</p>
+            </div>
+
+            <form wire:submit="saveValidation" class="mt-4 space-y-4">
+                <div>
+                    <label class="mb-2 block text-sm font-semibold text-on-surface">Status Validasi</label>
+                    <select wire:model.live="validationStatus"
+                        class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
+                        <option value="submitted">Belum Validasi</option>
+                        <option value="verified">Terverifikasi</option>
+                        <option value="lulus">Lulus</option>
+                        <option value="cadangan">Cadangan</option>
+                        <option value="ditolak">Ditolak</option>
+                    </select>
+                    @error('validationStatus')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="mb-2 block text-sm font-semibold text-on-surface">Catatan Validasi</label>
+                    <textarea rows="4" wire:model.live.blur="validationNote"
+                        placeholder="Tuliskan feedback validasi (wajib jika status bukan Belum Validasi)."
+                        class="w-full rounded-2xl border border-outline-variant/40 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10"></textarea>
+                    @error('validationNote')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <button type="submit" wire:loading.attr="disabled" wire:target="saveValidation"
+                    class="inline-flex w-full items-center justify-center rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white disabled:opacity-60 sm:w-auto">
+                    <span wire:loading.remove wire:target="saveValidation">Simpan Validasi</span>
+                    <span wire:loading wire:target="saveValidation">Menyimpan...</span>
+                </button>
+            </form>
         </article>
     </section>
 

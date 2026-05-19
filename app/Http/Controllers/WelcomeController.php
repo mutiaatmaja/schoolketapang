@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\NewsArticle;
 use App\Models\SchoolInformation;
+use App\Models\Student;
+use App\Models\Teacher;
 use App\Models\VisionMission;
 use Illuminate\Contracts\View\View;
 
@@ -54,6 +56,13 @@ class WelcomeController extends Controller
                 'category' => $article->category,
             ]);
 
+        $teacherCount = Teacher::query()->count('id');
+        $studentCount = Student::query()->count('id');
+        $achievementCount = NewsArticle::query()
+            ->published()
+            ->where('category', 'Prestasi')
+            ->count('id');
+
         return view('welcome', [
             'schoolName' => $schoolInformationMap->get('Nama Sekolah', 'Elementary School'),
             'schoolMotto' => $schoolInformationMap->get('Motto Sekolah', 'Cerdas, Berakhlak, dan Berprestasi Tanpa Batas'),
@@ -67,6 +76,9 @@ class WelcomeController extends Controller
             'contactEmail' => $schoolInformationMap->get('Email', 'info@school.edu'),
             'contactAddress' => $schoolInformationMap->get('Alamat', 'Alamat sekolah belum tersedia.'),
             'schoolNpsn' => $schoolInformationMap->get('NPSN', '-'),
+            'teacherCount' => $teacherCount,
+            'studentCount' => $studentCount,
+            'achievementCount' => $achievementCount,
         ]);
     }
 }

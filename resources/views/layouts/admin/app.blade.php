@@ -5,8 +5,10 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
     <title>Dashboard Administrasi SD Cerdas</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="stylesheet" href="//unpkg.com/jodit@4.1.16/es2021/jodit.min.css" />
     <link
         href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&amp;family=Nunito+Sans:wght@300;400;600;700&amp;display=swap"
         rel="stylesheet" />
@@ -407,6 +409,7 @@
             x-text="message"></div>
     </div>
     @livewireScripts()
+    <script src="//unpkg.com/jodit@4.1.16/es2021/jodit.min.js"></script>
 </body>
 
 </html>

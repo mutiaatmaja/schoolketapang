@@ -18,7 +18,7 @@ class PublicSpmbRegistrationTest extends TestCase
     {
         $this->get(route('ppdb.informasi'))
             ->assertOk()
-            ->assertSee('Pendaftaran siswa baru');
+            ->assertSee('Yang perlu disiapkan');
 
         $this->get(route('ppdb.daftar'))
             ->assertOk()

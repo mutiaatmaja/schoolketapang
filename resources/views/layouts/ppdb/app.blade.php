@@ -33,6 +33,8 @@
                 Ketapang</a>
             <div class="flex items-center gap-3 text-xs font-medium text-slate-500">
                 <a href="{{ route('ppdb.informasi') }}" wire:navigate class="transition hover:text-[#1d4f45]">Info</a>
+                <a href="{{ route('ppdb.statistik') }}" wire:navigate
+                    class="transition hover:text-[#1d4f45]">Statistik</a>
                 <a href="{{ route('ppdb.daftar') }}" wire:navigate class="transition hover:text-[#1d4f45]">Daftar</a>
                 <a href="{{ route('login') }}" class="transition hover:text-[#1d4f45]">Admin</a>
             </div>

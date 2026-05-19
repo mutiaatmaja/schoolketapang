@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\NewsImageUploadController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->middleware(['auth', 'role:superadmin|admin'])->name('admin.')->group(function () {
@@ -12,6 +13,7 @@ Route::prefix('admin')->middleware(['auth', 'role:superadmin|admin'])->name('adm
     Route::livewire('/publik/info-sekolah', 'pages::admin.publik.info-sekolah')->name('publik.info-sekolah');
     Route::livewire('/publik/visi-misi', 'pages::admin.publik.visi-misi')->name('publik.visi-misi');
     Route::livewire('/publik/berita', 'pages::admin.publik.berita')->name('publik.berita');
+    Route::post('/publik/berita/upload-image', NewsImageUploadController::class)->name('publik.berita.upload-image');
     Route::livewire('/publik/prestasi', 'pages::admin.publik.prestasi')->name('publik.prestasi');
     Route::livewire('/ppdb', 'pages::admin.ppdb.index')->name('ppdb.index');
     Route::livewire('/ppdb/pendaftar', 'pages::admin.ppdb.pendaftar')->name('ppdb.pendaftar');

@@ -58,6 +58,7 @@ new class extends Component {
     {
         $this->resetForm();
         $this->showFormModal = true;
+        $this->dispatch('update-jodit-content', ['news-content-editor', $this->content]);
     }
 
     public function openEdit(int $id): void
@@ -71,11 +72,13 @@ new class extends Component {
         $this->content = $article->content;
         $this->status = $article->status;
         $this->showFormModal = true;
+        $this->dispatch('update-jodit-content', ['news-content-editor', $this->content]);
     }
 
     public function save(): void
     {
         $validated = $this->validate();
+        $validated['content'] = $this->sanitizeContent($validated['content']);
 
         NewsArticle::query()->updateOrCreate(
             ['id' => $this->editingId],
@@ -124,6 +127,22 @@ new class extends Component {
         $this->excerpt = '';
         $this->content = '';
         $this->status = 'draft';
+    }
+
+    private function sanitizeContent(string $content): string
+    {
+        $config = \HTMLPurifier_Config::createDefault();
+        $config->set('HTML.Doctype', 'HTML 4.01 Transitional');
+        $config->set('HTML.Allowed', 'p,br,strong,em,u,s,blockquote,ul,ol,li,a[href|target|rel],img[src|alt|title|width|height],h1,h2,h3,h4,h5,h6,table,thead,tbody,tr,th,td,hr');
+        $config->set('Attr.AllowedFrameTargets', ['_blank']);
+        $config->set('CSS.AllowedProperties', ['text-align', 'width', 'height']);
+        $config->set('AutoFormat.RemoveEmpty', true);
+        $config->set('URI.AllowedSchemes', [
+            'http' => true,
+            'https' => true,
+        ]);
+
+        return new \HTMLPurifier($config)->purify($content);
     }
 
     private function generateUniqueSlug(string $title): string
@@ -293,9 +312,41 @@ new class extends Component {
 
                     <div>
                         <label class="text-sm font-semibold text-slate-700">Isi Berita</label>
-                        <textarea wire:model="content" rows="7"
-                            class="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm"></textarea>
-                        <p class="mt-1 text-xs text-slate-500">Pisahkan paragraf dengan baris kosong jika diperlukan.
+                        <div class="mt-2 overflow-hidden rounded-2xl border border-slate-300 bg-white">
+                            <livewire:jodit-text-editor wire:model.live="content" identifier="news-content-editor"
+                                :buttons="[
+                                    'source',
+                                    '|',
+                                    'bold',
+                                    'italic',
+                                    'underline',
+                                    'strikethrough',
+                                    '|',
+                                    'ul',
+                                    'ol',
+                                    '|',
+                                    'outdent',
+                                    'indent',
+                                    '|',
+                                    'font',
+                                    'fontsize',
+                                    'paragraph',
+                                    'brush',
+                                    '|',
+                                    'link',
+                                    'image',
+                                    'table',
+                                    '|',
+                                    'align',
+                                    'undo',
+                                    'redo',
+                                ]" theme="default" :key="'news-content-editor-' .
+                                    ($editingId ?? 'create') .
+                                    '-' .
+                                    ($showFormModal ? 'open' : 'closed')" />
+                        </div>
+                        <p class="mt-1 text-xs text-slate-500">Gunakan tombol gambar untuk menyisipkan foto ke isi
+                            berita. File gambar akan diunggah ke storage publik.
                         </p>
                         @error('content')
                             <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
