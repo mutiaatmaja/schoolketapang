@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\NewsImageUploadController;
+use App\Http\Controllers\Admin\SpmbRegistrationExportController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->middleware(['auth', 'role:superadmin|admin'])->name('admin.')->group(function () {
@@ -22,6 +23,7 @@ Route::prefix('admin')->middleware(['auth', 'role:superadmin|admin'])->name('adm
     Route::livewire('/ppdb/lulus', 'pages::admin.ppdb.lulus')->name('ppdb.lulus');
     Route::livewire('/ppdb/cadangan', 'pages::admin.ppdb.cadangan')->name('ppdb.cadangan');
     Route::livewire('/ppdb/ditolak', 'pages::admin.ppdb.ditolak')->name('ppdb.ditolak');
+    Route::get('/ppdb/export/{status}', SpmbRegistrationExportController::class)->name('ppdb.export');
     Route::livewire('/kelola-user', 'pages::admin.kelola-user.users')->name('users.index');
     Route::livewire('/kelola-user/role', 'pages::admin.kelola-user.roles')->name('users.roles');
 });

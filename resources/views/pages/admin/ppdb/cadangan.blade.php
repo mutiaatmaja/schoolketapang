@@ -28,9 +28,18 @@ new class extends Component {
 
 <div class="space-y-6">
     <header class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-        <p class="text-xs font-semibold uppercase tracking-wide text-indigo-600">Admin SPMB</p>
-        <h1 class="mt-2 text-2xl font-bold text-slate-800">Peserta Cadangan</h1>
-        <p class="mt-2 text-sm text-slate-600">Daftar peserta dalam status cadangan berdasarkan peringkat.</p>
+        <div class="flex items-start justify-between gap-4">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-wide text-indigo-600">Admin SPMB</p>
+                <h1 class="mt-2 text-2xl font-bold text-slate-800">Peserta Cadangan</h1>
+                <p class="mt-2 text-sm text-slate-600">Daftar peserta dalam status cadangan berdasarkan peringkat.</p>
+            </div>
+            <a href="{{ route('admin.ppdb.export', ['status' => 'cadangan']) }}"
+                class="mt-1 inline-flex shrink-0 items-center gap-2 rounded-2xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 active:scale-95">
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                Export Excel
+            </a>
+        </div>
     </header>
 
     <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
