@@ -33,11 +33,17 @@ new class extends Component {
             <div>
                 <p class="text-xs font-semibold uppercase tracking-wide text-rose-600">Admin SPMB</p>
                 <h1 class="mt-2 text-2xl font-bold text-slate-800">Peserta Ditolak</h1>
-                <p class="mt-2 text-sm text-slate-600">Daftar peserta yang tidak lolos seleksi beserta catatan singkat.</p>
+                <p class="mt-2 text-sm text-slate-600">Daftar peserta yang tidak lolos seleksi beserta catatan singkat.
+                </p>
             </div>
             <a href="{{ route('admin.ppdb.export', ['status' => 'ditolak']) }}"
                 class="mt-1 inline-flex shrink-0 items-center gap-2 rounded-2xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 active:scale-95">
-                <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" x2="12" y1="15" y2="3" />
+                </svg>
                 Export Excel
             </a>
         </div>
@@ -45,7 +51,8 @@ new class extends Component {
 
     <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <div class="relative mb-4 max-w-md">
-            <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari nomor, nama, NIK, atau catatan"
+            <input type="text" wire:model.live.debounce.300ms="search"
+                placeholder="Cari nomor, nama, NIK, atau catatan"
                 class="w-full rounded-2xl border border-slate-300 px-4 py-3 pr-12 text-sm">
             <span wire:loading wire:target="search"
                 class="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-500">Cari...</span>
