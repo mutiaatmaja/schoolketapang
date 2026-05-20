@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\NewsArticle;
 use App\Models\Role;
+use App\Models\SchoolAchievement;
 use App\Models\SchoolInformation;
 use App\Models\User;
 use App\Models\VisionMission;
@@ -105,6 +106,35 @@ class AdminPublicContentCrudTest extends TestCase
 
         $this->assertDatabaseMissing('news_articles', [
             'id' => $article->id,
+        ]);
+    }
+
+    public function test_admin_can_create_update_and_delete_school_achievements(): void
+    {
+        $user = User::factory()->create();
+
+        Livewire::actingAs($user)
+            ->test('pages::admin.publik.prestasi')
+            ->call('openCreate')
+            ->set('title', 'Juara 1')
+            ->set('description', 'Olimpiade Sains Nasional Tingkat Provinsi')
+            ->set('level', 'Provinsi')
+            ->set('year', '2026')
+            ->call('save');
+
+        $achievement = SchoolAchievement::query()->where('title', 'Juara 1')->firstOrFail();
+
+        Livewire::actingAs($user)
+            ->test('pages::admin.publik.prestasi')
+            ->call('openEdit', $achievement->id)
+            ->set('description', 'Olimpiade Sains Nasional Tingkat Nasional')
+            ->set('level', 'Nasional')
+            ->call('save')
+            ->call('confirmDelete', $achievement->id)
+            ->call('delete');
+
+        $this->assertDatabaseMissing('school_achievements', [
+            'id' => $achievement->id,
         ]);
     }
 

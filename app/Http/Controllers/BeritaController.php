@@ -4,11 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Models\NewsArticle;
 use App\Models\SchoolInformation;
-use Illuminate\Http\Response;
+use Illuminate\Contracts\View\View;
 
 class BeritaController extends Controller
 {
-    public function show(string $slug): Response
+    public function index(): View
+    {
+        $schoolInformation = SchoolInformation::query()->where('label', 'Nama Sekolah')->value('value');
+
+        return view('berita.index', [
+            'schoolName' => $schoolInformation,
+            'articles' => NewsArticle::query()
+                ->published()
+                ->orderByDesc('published_at')
+                ->paginate(9),
+        ]);
+    }
+
+    public function show(string $slug): View
     {
         $article = NewsArticle::query()
             ->published()
@@ -17,7 +30,7 @@ class BeritaController extends Controller
         $schoolInformation = SchoolInformation::query()->where('label', 'Nama Sekolah')->value('value');
         $summaryPoints = $this->extractSummaryPoints($article->content);
 
-        return response()->view('berita.show', [
+        return view('berita.show', [
             'schoolName' => $schoolInformation,
             'article' => [
                 'title' => $article->title,

@@ -360,7 +360,8 @@
                 <div class="flex justify-between items-end mb-10">
                     <h3 class="font-headline-lg text-headline-lg text-primary border-l-4 border-secondary pl-4">Berita
                         &amp; Pengumuman</h3>
-                    <a class="text-primary font-label-md text-label-md hover:underline" href="#berita">Lihat Semua</a>
+                    <a class="text-primary font-label-md text-label-md hover:underline"
+                        href="{{ route('berita.index') }}">Lihat Semua</a>
                 </div>
                 <div class="space-y-6">
                     @forelse ($newsArticles->take(2) as $article)
@@ -400,47 +401,57 @@
                 <div class="flex justify-between items-end mb-10">
                     <h3 class="font-headline-lg text-headline-lg text-primary border-l-4 border-secondary pl-4">
                         Prestasi Siswa</h3>
-                    <a class="text-primary font-label-md text-label-md hover:underline" href="#">Lihat Semua</a>
+                    <a class="text-primary font-label-md text-label-md hover:underline"
+                        href="{{ route('prestasi.index') }}">
+                        {{ number_format($achievementCount, 0, ',', '.') }} total
+                    </a>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div class="bg-secondary-fixed/30 p-6 rounded-3xl flex flex-col items-center text-center">
-                        <div class="bg-white p-4 rounded-full shadow-sm mb-4">
-                            <span class="material-symbols-outlined text-secondary text-3xl"
-                                style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+                    @php
+                        $achievementStyles = [
+                            [
+                                'card' => 'bg-secondary-fixed/30',
+                                'icon' => 'workspace_premium',
+                                'iconColor' => 'text-secondary',
+                            ],
+                            ['card' => 'bg-primary-fixed/30', 'icon' => 'emoji_events', 'iconColor' => 'text-primary'],
+                            ['card' => 'bg-primary-fixed/30', 'icon' => 'military_tech', 'iconColor' => 'text-primary'],
+                            [
+                                'card' => 'bg-secondary-fixed/30',
+                                'icon' => 'rewarded_ads',
+                                'iconColor' => 'text-secondary',
+                            ],
+                        ];
+                    @endphp
+
+                    @forelse ($achievementHighlights as $achievement)
+                        @php($style = $achievementStyles[$loop->index % count($achievementStyles)])
+                        <div class="{{ $style['card'] }} p-6 rounded-3xl flex flex-col items-center text-center">
+                            <div class="bg-white p-4 rounded-full shadow-sm mb-4">
+                                <span class="material-symbols-outlined {{ $style['iconColor'] }} text-3xl"
+                                    style="font-variation-settings: 'FILL' 1;">{{ $style['icon'] }}</span>
+                            </div>
+                            <h4 class="font-label-md text-label-md text-primary mb-2 uppercase">
+                                {{ $achievement['title'] }}</h4>
+                            <p class="font-body-md text-body-md font-bold">{{ $achievement['description'] }}</p>
+                            <p class="mt-3 text-sm text-on-surface-variant">{{ $achievement['level'] }} •
+                                {{ $achievement['year'] }}</p>
                         </div>
-                        <h4 class="font-label-md text-label-md text-primary mb-2 uppercase">Juara 1</h4>
-                        <p class="font-body-md text-body-md font-bold">Olimpiade Sains Nasional Tk. Provinsi</p>
-                    </div>
-                    <div class="bg-primary-fixed/30 p-6 rounded-3xl flex flex-col items-center text-center">
-                        <div class="bg-white p-4 rounded-full shadow-sm mb-4">
-                            <span class="material-symbols-outlined text-primary text-3xl"
-                                style="font-variation-settings: 'FILL' 1;">emoji_events</span>
+                    @empty
+                        <div
+                            class="sm:col-span-2 bg-surface-container-highest p-6 rounded-3xl text-center text-on-surface-variant">
+                            Data prestasi belum tersedia.
                         </div>
-                        <h4 class="font-label-md text-label-md text-primary mb-2 uppercase">Medali Emas</h4>
-                        <p class="font-body-md text-body-md font-bold">Kejuaraan Karate Junior Se-Jabodetabek</p>
-                    </div>
-                    <div class="bg-primary-fixed/30 p-6 rounded-3xl flex flex-col items-center text-center">
-                        <div class="bg-white p-4 rounded-full shadow-sm mb-4">
-                            <span class="material-symbols-outlined text-primary text-3xl"
-                                style="font-variation-settings: 'FILL' 1;">military_tech</span>
+                    @endforelse
+
+                    @if ($remainingAchievementCount > 0)
+                        <div
+                            class="sm:col-span-2 bg-surface-container-highest p-6 rounded-3xl flex items-center justify-center gap-4">
+                            <span class="material-symbols-outlined text-on-surface-variant">stars</span>
+                            <p class="font-body-md text-body-md">Dan
+                                +{{ number_format($remainingAchievementCount, 0, ',', '.') }} prestasi lainnya.</p>
                         </div>
-                        <h4 class="font-label-md text-label-md text-primary mb-2 uppercase">Juara Umum</h4>
-                        <p class="font-body-md text-body-md font-bold">Lomba Cerdas Cermat Tk. Kota</p>
-                    </div>
-                    <div class="bg-secondary-fixed/30 p-6 rounded-3xl flex flex-col items-center text-center">
-                        <div class="bg-white p-4 rounded-full shadow-sm mb-4">
-                            <span class="material-symbols-outlined text-secondary text-3xl"
-                                style="font-variation-settings: 'FILL' 1;">rewarded_ads</span>
-                        </div>
-                        <h4 class="font-label-md text-label-md text-primary mb-2 uppercase">Favorit</h4>
-                        <p class="font-body-md text-body-md font-bold">Festival Seni &amp; Tari Tradisional Nasional
-                        </p>
-                    </div>
-                    <div
-                        class="sm:col-span-2 bg-surface-container-highest p-6 rounded-3xl flex items-center justify-center gap-4">
-                        <span class="material-symbols-outlined text-on-surface-variant">stars</span>
-                        <p class="font-body-md text-body-md">Dan +50 Prestasi Lainnya di Tahun 2024</p>
-                    </div>
+                    @endif
                 </div>
             </div>
         </div>

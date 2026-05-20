@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>SPMB SD Ketapang</title>
+    <title>SPMB {{ $schoolInfo['Nama Sekolah'] ?? 'SD Ketapang' }}</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,8 +29,8 @@
     <div class="mx-auto flex min-h-screen w-full max-w-md flex-col px-4 pb-8 pt-4 sm:max-w-lg sm:px-5">
         <header
             class="mb-5 flex items-center justify-between rounded-3xl bg-white/80 px-4 py-3 shadow-sm ring-1 ring-white/60 backdrop-blur">
-            <a href="{{ route('ppdb.informasi') }}" wire:navigate class="text-sm font-semibold text-[#1d4f45]">SPMB SD
-                Ketapang</a>
+            <a href="{{ route('ppdb.informasi') }}" wire:navigate class="text-sm font-semibold text-[#1d4f45]">SPMB
+                {{ $schoolInfo['Nama Sekolah'] ?? 'SD Ketapang' }}</a>
             <div class="flex items-center gap-3 text-xs font-medium text-slate-500">
                 <a href="{{ route('ppdb.informasi') }}" wire:navigate class="transition hover:text-[#1d4f45]">Info</a>
                 <a href="{{ route('ppdb.statistik') }}" wire:navigate

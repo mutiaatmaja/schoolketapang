@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\NewsArticle;
+use App\Models\SchoolAchievement;
 use App\Models\Student;
 use App\Models\Teacher;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -26,15 +26,7 @@ class ExampleTest extends TestCase
     {
         Teacher::factory()->count(3)->create();
         Student::factory()->count(4)->create();
-        NewsArticle::factory()->count(2)->published()->create([
-            'category' => 'Prestasi',
-        ]);
-        NewsArticle::factory()->published()->create([
-            'category' => 'Pengumuman',
-        ]);
-        NewsArticle::factory()->draft()->create([
-            'category' => 'Prestasi',
-        ]);
+        SchoolAchievement::factory()->count(2)->create();
 
         $this->get('/')
             ->assertOk()
@@ -44,5 +36,32 @@ class ExampleTest extends TestCase
             ->assertSee('Jumlah Guru')
             ->assertSee('Jumlah Siswa')
             ->assertSee('Jumlah Prestasi');
+    }
+
+    public function test_welcome_page_displays_dynamic_achievement_highlights(): void
+    {
+        SchoolAchievement::factory()->create([
+            'title' => 'Juara 1',
+            'description' => 'Olimpiade Matematika Tingkat Kabupaten',
+            'level' => 'Kabupaten',
+            'year' => 2026,
+            'sort_order' => 1,
+        ]);
+
+        SchoolAchievement::factory()->create([
+            'title' => 'Medali Emas',
+            'description' => 'Kejuaraan Karate Pelajar',
+            'level' => 'Provinsi',
+            'year' => 2025,
+            'sort_order' => 2,
+        ]);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Juara 1')
+            ->assertSee('Olimpiade Matematika Tingkat Kabupaten')
+            ->assertSee('Kabupaten')
+            ->assertSee('Medali Emas')
+            ->assertSee('Kejuaraan Karate Pelajar');
     }
 }

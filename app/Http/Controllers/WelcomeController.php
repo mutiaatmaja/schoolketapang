@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\NewsArticle;
+use App\Models\SchoolAchievement;
 use App\Models\SchoolInformation;
 use App\Models\Student;
 use App\Models\Teacher;
@@ -56,12 +57,20 @@ class WelcomeController extends Controller
                 'category' => $article->category,
             ]);
 
+        $achievementHighlights = SchoolAchievement::query()
+            ->ordered()
+            ->limit(4)
+            ->get()
+            ->map(fn (SchoolAchievement $achievement): array => [
+                'title' => $achievement->title,
+                'description' => $achievement->description,
+                'level' => $achievement->level,
+                'year' => $achievement->year,
+            ]);
+
         $teacherCount = Teacher::query()->count('id');
         $studentCount = Student::query()->count('id');
-        $achievementCount = NewsArticle::query()
-            ->published()
-            ->where('category', 'Prestasi')
-            ->count('id');
+        $achievementCount = SchoolAchievement::query()->count('id');
 
         return view('welcome', [
             'schoolName' => $schoolInformationMap->get('Nama Sekolah', 'Elementary School'),
@@ -79,6 +88,8 @@ class WelcomeController extends Controller
             'teacherCount' => $teacherCount,
             'studentCount' => $studentCount,
             'achievementCount' => $achievementCount,
+            'achievementHighlights' => $achievementHighlights,
+            'remainingAchievementCount' => max($achievementCount - $achievementHighlights->count(), 0),
         ]);
     }
 }

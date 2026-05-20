@@ -10,9 +10,9 @@ class SchoolInformationSeeder extends Seeder
     public function run(): void
     {
         $items = [
-            ['label' => 'NPSN', 'value' => '20123456', 'sort_order' => 1],
-            ['label' => 'Nama Sekolah', 'value' => 'SD Cerdas Ketapang', 'sort_order' => 2],
-            ['label' => 'Alamat', 'value' => 'Jl. Pendidikan No. 123, Ketapang, Kalimantan Barat', 'sort_order' => 3],
+            ['label' => 'NPSN', 'value' => '30103600', 'sort_order' => 1],
+            ['label' => 'Nama Sekolah', 'value' => 'SDN 22 Delta Pawan', 'sort_order' => 2],
+            ['label' => 'Alamat', 'value' => 'JJl. Brigjend Katamso', 'sort_order' => 3],
             ['label' => 'No. Telepon', 'value' => '(0534) 123456', 'sort_order' => 4],
             ['label' => 'Email', 'value' => 'info@sdcerdas.sch.id', 'sort_order' => 5],
             ['label' => 'Website', 'value' => 'www.sdcerdas.sch.id', 'sort_order' => 6],
