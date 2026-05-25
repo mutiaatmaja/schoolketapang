@@ -10,6 +10,7 @@ use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -98,6 +99,45 @@ class AdminAcademicCrudTest extends TestCase
         $this->assertDatabaseMissing('teachers', ['id' => $teacher->id]);
     }
 
+    public function test_admin_can_create_student_with_optional_identity_and_parent_fields_empty(): void
+    {
+        $user = User::factory()->create();
+        $schoolClass = SchoolClass::factory()->create(['name' => '1']);
+
+        Livewire::actingAs($user)
+            ->test('pages::admin.akademik.siswa')
+            ->call('openCreate')
+            ->set('schoolClassId', $schoolClass->id)
+            ->set('name', 'Mira Safitri')
+            ->set('nis', '2025999')
+            ->set('birthPlace', 'Ketapang')
+            ->set('birthDate', '2015-01-05')
+            ->set('nik', '')
+            ->set('gender', 'Perempuan')
+            ->set('religion', 'Islam')
+            ->set('fatherName', '')
+            ->set('motherName', '')
+            ->set('fatherOccupation', '')
+            ->set('motherOccupation', '')
+            ->set('fatherPhone', '')
+            ->set('motherPhone', '')
+            ->set('address', '')
+            ->set('notes', '')
+            ->set('status', 'AKTIF')
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('students', [
+            'nis' => '2025999',
+            'nik' => null,
+            'father_name' => null,
+            'mother_name' => null,
+            'father_phone' => null,
+            'mother_phone' => null,
+            'address' => null,
+        ]);
+    }
+
     public function test_teacher_import_creates_records(): void
     {
         $import = new TeachersImport;
@@ -153,6 +193,41 @@ class AdminAcademicCrudTest extends TestCase
         $this->assertSame(1, $import->processedRows());
         $this->assertDatabaseHas('school_classes', ['name' => '2']);
         $this->assertDatabaseHas('students', ['nis' => '2025002']);
+    }
+
+    public function test_student_import_from_uploaded_csv_file_creates_records(): void
+    {
+        $user = User::factory()->create();
+
+        $csv = implode("\n", [
+            'nama_siswa,nis,nisn,tempat_lahir,tanggal_lahir,nik,jenis_kelamin,agama,nama_ayah,nama_ibu,pekerjaan_ayah,pekerjaan_ibu,no_hp_ayah,no_hp_ibu,alamat,keterangan,kelas,status',
+            'Nur Aisyah,2025002,1234567891,Ketapang,2014-02-10,3173000000004444,Perempuan,Islam,Ahmad Yani,Siti Aisyah,Petani,Pedagang,081300000004,081300000005,"Jl. Siswa No. 4",Aktif,2,AKTIF',
+        ]);
+
+        Livewire::actingAs($user)
+            ->test('pages::admin.akademik.siswa')
+            ->call('openImport')
+            ->set('importFile', UploadedFile::fake()->createWithContent('siswa.csv', $csv))
+            ->call('importStudents')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('school_classes', ['name' => '2']);
+        $this->assertDatabaseHas('students', ['nis' => '2025002']);
+    }
+
+    public function test_student_import_shows_error_when_uploaded_file_has_no_data_rows(): void
+    {
+        $user = User::factory()->create();
+
+        $csv = 'nama_siswa,nis,nisn,tempat_lahir,tanggal_lahir,nik,jenis_kelamin,agama,nama_ayah,nama_ibu,pekerjaan_ayah,pekerjaan_ibu,no_hp_ayah,no_hp_ibu,alamat,keterangan,kelas,status';
+
+        Livewire::actingAs($user)
+            ->test('pages::admin.akademik.siswa')
+            ->call('openImport')
+            ->set('importFile', UploadedFile::fake()->createWithContent('siswa-kosong.csv', $csv))
+            ->call('importStudents')
+            ->assertHasErrors(['importFile'])
+            ->assertDispatched('toast');
     }
 
     public function test_academic_summary_page_uses_dynamic_counts(): void

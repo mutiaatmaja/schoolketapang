@@ -96,6 +96,43 @@ class AdminPpdbApplicantsCrudTest extends TestCase
         ]);
     }
 
+    public function test_admin_can_create_applicant_with_optional_identity_and_parent_fields_empty(): void
+    {
+        $admin = $this->createAdminUser();
+
+        Livewire::actingAs($admin)
+            ->test('pages::admin.ppdb.pendaftar')
+            ->call('openCreate')
+            ->set('name', 'Fira Anjani')
+            ->set('birthPlace', 'Ketapang')
+            ->set('birthDate', '2018-04-10')
+            ->set('nik', '')
+            ->set('familyCardNumber', '3201010101010777')
+            ->set('gender', 'Perempuan')
+            ->set('religion', 'Islam')
+            ->set('fatherName', '')
+            ->set('motherName', '')
+            ->set('fatherOccupation', '')
+            ->set('motherOccupation', '')
+            ->set('fatherPhone', '')
+            ->set('motherPhone', '')
+            ->set('address', '')
+            ->set('notes', '')
+            ->set('status', 'submitted')
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('spmb_registrations', [
+            'name' => 'Fira Anjani',
+            'nik' => null,
+            'father_name' => null,
+            'mother_name' => null,
+            'father_phone' => null,
+            'mother_phone' => null,
+            'address' => null,
+        ]);
+    }
+
     public function test_admin_can_open_participant_detail_page(): void
     {
         $admin = $this->createAdminUser();

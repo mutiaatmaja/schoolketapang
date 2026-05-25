@@ -18,10 +18,13 @@ class StudentsImport implements ToCollection, WithHeadingRow
 
     public function collection(Collection $collection): void
     {
+
         $collection
-            ->filter(fn (array $row): bool => collect($row)->filter(fn ($value) => $value !== null && $value !== '')->isNotEmpty())
-            ->each(function (array $row): void {
-                $data = Validator::make($row, $this->rules(), [], $this->validationAttributes())->validate();
+            ->map(fn (array|Collection $row): Collection => collect($row))
+            ->map(fn (Collection $row): Collection => $this->normalizeRow($row))
+            ->filter(fn (Collection $row): bool => $row->filter(fn ($value) => $value !== null && $value !== '')->isNotEmpty())
+            ->each(function (Collection $row): void {
+                $data = Validator::make($row->all(), $this->rules(), [], $this->validationAttributes())->validate();
                 $schoolClass = SchoolClass::query()->firstOrCreate(['name' => trim((string) $data['kelas'])]);
 
                 Student::query()->updateOrCreate(
@@ -32,11 +35,11 @@ class StudentsImport implements ToCollection, WithHeadingRow
                         'nisn' => $this->nullableString($data['nisn'] ?? null),
                         'birth_place' => trim((string) $data['tempat_lahir']),
                         'birth_date' => $this->parseDate($data['tanggal_lahir']),
-                        'nik' => trim((string) $data['nik']),
+                        'nik' => $this->nullableString($data['nik'] ?? null),
                         'gender' => trim((string) $data['jenis_kelamin']),
                         'religion' => trim((string) $data['agama']),
-                        'father_name' => trim((string) $data['nama_ayah']),
-                        'mother_name' => trim((string) $data['nama_ibu']),
+                        'father_name' => $this->nullableString($data['nama_ayah'] ?? null),
+                        'mother_name' => $this->nullableString($data['nama_ibu'] ?? null),
                         'father_occupation' => $this->nullableString($data['pekerjaan_ayah'] ?? null),
                         'mother_occupation' => $this->nullableString($data['pekerjaan_ibu'] ?? null),
                         'father_phone' => $this->nullableString($data['no_hp_ayah'] ?? null),
@@ -59,11 +62,11 @@ class StudentsImport implements ToCollection, WithHeadingRow
             'nisn' => ['nullable', 'string', 'max:30'],
             'tempat_lahir' => ['required', 'string', 'max:100'],
             'tanggal_lahir' => ['required'],
-            'nik' => ['required', 'string', 'max:30'],
-            'jenis_kelamin' => ['required', 'string', 'in:Laki-laki,Perempuan'],
+            'nik' => ['nullable', 'string', 'max:30'],
+            'jenis_kelamin' => ['required', 'string', 'in:Laki-Laki,Perempuan'],
             'agama' => ['required', 'string', 'max:50'],
-            'nama_ayah' => ['required', 'string', 'max:255'],
-            'nama_ibu' => ['required', 'string', 'max:255'],
+            'nama_ayah' => ['nullable', 'string', 'max:255'],
+            'nama_ibu' => ['nullable', 'string', 'max:255'],
             'pekerjaan_ayah' => ['nullable', 'string', 'max:255'],
             'pekerjaan_ibu' => ['nullable', 'string', 'max:255'],
             'no_hp_ayah' => ['nullable', 'string', 'max:30'],
@@ -105,6 +108,25 @@ class StudentsImport implements ToCollection, WithHeadingRow
     public function processedRows(): int
     {
         return $this->processedRows;
+    }
+
+    private function normalizeRow(Collection $row): Collection
+    {
+        return $row->map(function (mixed $value): mixed {
+            if ($value === null) {
+                return null;
+            }
+
+            if (is_string($value)) {
+                return trim($value);
+            }
+
+            if (is_int($value) || is_float($value)) {
+                return (string) $value;
+            }
+
+            return $value;
+        });
     }
 
     private function nullableString(mixed $value): ?string

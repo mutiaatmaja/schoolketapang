@@ -1,4 +1,8 @@
-<?php
+@cannot ('update', $post)
+
+@elsecannot ('create', $post)
+
+@endcannot<?php
 
 use App\Models\SchoolAchievement;
 use Illuminate\Support\Collection;

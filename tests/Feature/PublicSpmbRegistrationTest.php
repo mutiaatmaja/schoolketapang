@@ -85,6 +85,47 @@ class PublicSpmbRegistrationTest extends TestCase
         $this->assertTrue(Storage::disk('public')->exists($registration->student_photo_path));
     }
 
+    public function test_guest_can_submit_spmb_registration_with_optional_family_fields_empty(): void
+    {
+        Storage::fake('public');
+
+        Livewire::test('pages::ppdb.daftar')
+            ->set('nik', '')
+            ->call('nextStep')
+            ->set('name', 'Rafi Pratama')
+            ->set('birthPlace', 'Ketapang')
+            ->set('birthDate', '2018-06-01')
+            ->set('familyCardNumber', '3201010101010102')
+            ->set('gender', 'Laki-laki')
+            ->set('religion', 'Islam')
+            ->call('nextStep')
+            ->set('fatherName', '')
+            ->set('motherName', '')
+            ->set('fatherPhone', '')
+            ->set('motherPhone', '')
+            ->set('fatherOccupation', '')
+            ->set('motherOccupation', '')
+            ->set('address', '')
+            ->call('nextStep')
+            ->set('birthCertificate', UploadedFile::fake()->create('akta.pdf', 200, 'application/pdf'))
+            ->set('familyCard', UploadedFile::fake()->create('kk.pdf', 200, 'application/pdf'))
+            ->set('studentPhoto', UploadedFile::fake()->image('foto.jpg'))
+            ->call('nextStep')
+            ->call('submitForm')
+            ->assertSet('submitted', true)
+            ->assertHasNoErrors();
+
+        $registration = SpmbRegistration::query()->latest('id')->first();
+
+        $this->assertNotNull($registration);
+        $this->assertNull($registration->nik);
+        $this->assertNull($registration->father_name);
+        $this->assertNull($registration->mother_name);
+        $this->assertNull($registration->father_phone);
+        $this->assertNull($registration->mother_phone);
+        $this->assertNull($registration->address);
+    }
+
     public function test_guest_cannot_continue_when_nik_is_already_registered(): void
     {
         SpmbRegistration::factory()->create([
