@@ -1,334 +1,416 @@
 <?php
 
-use Livewire\Attributes\Layout;
+use App\Models\NewsArticle;
+use App\Models\SchoolAchievement;
+use App\Models\SchoolClass;
+use App\Models\SchoolInformation;
+use App\Models\SpmbRegistration;
+use App\Models\Student;
+use App\Models\Teacher;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 new class extends Component {
-    public array $stats = [
-        'total_pendaftar' => 128,
-        'menunggu_verifikasi' => 32,
-        'lulus' => 74,
-        'cadangan' => 12,
-    ];
-
     public function refreshStats(): void
     {
         $this->dispatch('toast', type: 'success', message: 'Statistik dashboard berhasil diperbarui.');
     }
+
+    public function getSchoolInfoProperty(): array
+    {
+        return SchoolInformation::query()->ordered()->pluck('value', 'label')->all();
+    }
+
+    public function getSchoolNameProperty(): string
+    {
+        return $this->schoolInfo['Nama Sekolah'] ?? 'Dashboard Administrasi Sekolah';
+    }
+
+    public function getSchoolMottoProperty(): ?string
+    {
+        return $this->schoolInfo['Motto Sekolah'] ?? null;
+    }
+
+    public function getHeroStatsProperty(): array
+    {
+        $spmbCounts = SpmbRegistration::query()->selectRaw('COUNT(*) as total')->selectRaw("SUM(CASE WHEN status = 'submitted' THEN 1 ELSE 0 END) as submitted")->first();
+
+        return [
+            [
+                'label' => 'Menunggu Validasi',
+                'value' => (int) ($spmbCounts?->submitted ?? 0),
+                'route' => route('admin.ppdb.belum-validasi'),
+            ],
+            [
+                'label' => 'Berita Dipublikasikan',
+                'value' => NewsArticle::query()->published()->count(),
+                'route' => route('admin.publik.berita'),
+            ],
+            [
+                'label' => 'Draft Berita',
+                'value' => NewsArticle::query()->where('status', 'draft')->count(),
+                'route' => route('admin.publik.berita'),
+            ],
+            [
+                'label' => 'Prestasi Sekolah',
+                'value' => SchoolAchievement::query()->count(),
+                'route' => route('admin.publik.prestasi'),
+            ],
+        ];
+    }
+
+    public function getSummaryCardsProperty(): array
+    {
+        $studentCounts = Student::query()->selectRaw('COUNT(*) as total')->selectRaw("SUM(CASE WHEN status = 'AKTIF' THEN 1 ELSE 0 END) as active")->first();
+
+        $teacherCounts = Teacher::query()->selectRaw('COUNT(*) as total')->selectRaw("SUM(CASE WHEN employment_status = 'Tetap' THEN 1 ELSE 0 END) as permanent")->first();
+
+        $spmbCounts = SpmbRegistration::query()->selectRaw('COUNT(*) as total')->selectRaw("SUM(CASE WHEN status = 'submitted' THEN 1 ELSE 0 END) as submitted")->first();
+
+        return [
+            [
+                'label' => 'Total Siswa',
+                'value' => (int) ($studentCounts?->total ?? 0),
+                'meta' => (int) ($studentCounts?->active ?? 0) . ' siswa aktif',
+                'route' => route('admin.akademik.siswa'),
+                'icon' => 'groups',
+                'icon_class' => 'bg-primary/10 text-primary',
+            ],
+            [
+                'label' => 'Total Guru',
+                'value' => (int) ($teacherCounts?->total ?? 0),
+                'meta' => (int) ($teacherCounts?->permanent ?? 0) . ' guru tetap',
+                'route' => route('admin.akademik.guru'),
+                'icon' => 'school',
+                'icon_class' => 'bg-secondary/10 text-secondary',
+            ],
+            [
+                'label' => 'Total Kelas',
+                'value' => SchoolClass::query()->count(),
+                'meta' => 'Struktur rombel aktif',
+                'route' => route('admin.akademik.kelas'),
+                'icon' => 'meeting_room',
+                'icon_class' => 'bg-tertiary-fixed-dim/30 text-tertiary',
+            ],
+            [
+                'label' => 'Pendaftar SPMB',
+                'value' => (int) ($spmbCounts?->total ?? 0),
+                'meta' => (int) ($spmbCounts?->submitted ?? 0) . ' belum divalidasi',
+                'route' => route('admin.ppdb.pendaftar'),
+                'icon' => 'app_registration',
+                'icon_class' => 'bg-error-container/20 text-error',
+            ],
+        ];
+    }
+
+    public function getSpmbStatusesProperty(): array
+    {
+        $counts = SpmbRegistration::query()->selectRaw('COUNT(*) as total')->selectRaw("SUM(CASE WHEN status = 'submitted' THEN 1 ELSE 0 END) as submitted")->selectRaw("SUM(CASE WHEN status = 'verified' THEN 1 ELSE 0 END) as verified")->selectRaw("SUM(CASE WHEN status = 'lulus' THEN 1 ELSE 0 END) as lulus")->selectRaw("SUM(CASE WHEN status = 'cadangan' THEN 1 ELSE 0 END) as cadangan")->selectRaw("SUM(CASE WHEN status = 'ditolak' THEN 1 ELSE 0 END) as ditolak")->first();
+
+        return [
+            [
+                'label' => 'Belum Validasi',
+                'value' => (int) ($counts?->submitted ?? 0),
+                'description' => 'Pendaftar yang masih menunggu peninjauan berkas.',
+                'route' => route('admin.ppdb.belum-validasi'),
+                'card_class' => 'hover:border-amber-200 hover:bg-amber-50/60',
+                'pill_class' => 'bg-amber-100 text-amber-800',
+            ],
+            [
+                'label' => 'Terverifikasi',
+                'value' => (int) ($counts?->verified ?? 0),
+                'description' => 'Berkas sudah diverifikasi dan siap penetapan lanjutan.',
+                'route' => route('admin.ppdb.pendaftar'),
+                'card_class' => 'hover:border-sky-200 hover:bg-sky-50/60',
+                'pill_class' => 'bg-sky-100 text-sky-800',
+            ],
+            [
+                'label' => 'Lulus',
+                'value' => (int) ($counts?->lulus ?? 0),
+                'description' => 'Peserta yang dinyatakan lulus seleksi.',
+                'route' => route('admin.ppdb.lulus'),
+                'card_class' => 'hover:border-emerald-200 hover:bg-emerald-50/60',
+                'pill_class' => 'bg-emerald-100 text-emerald-800',
+            ],
+            [
+                'label' => 'Cadangan',
+                'value' => (int) ($counts?->cadangan ?? 0),
+                'description' => 'Peserta pada daftar cadangan aktif.',
+                'route' => route('admin.ppdb.cadangan'),
+                'card_class' => 'hover:border-violet-200 hover:bg-violet-50/60',
+                'pill_class' => 'bg-violet-100 text-violet-800',
+            ],
+            [
+                'label' => 'Ditolak',
+                'value' => (int) ($counts?->ditolak ?? 0),
+                'description' => 'Peserta yang tidak lolos pada tahap seleksi.',
+                'route' => route('admin.ppdb.ditolak'),
+                'card_class' => 'hover:border-rose-200 hover:bg-rose-50/60',
+                'pill_class' => 'bg-rose-100 text-rose-800',
+            ],
+        ];
+    }
+
+    public function getLatestNewsProperty(): array
+    {
+        return NewsArticle::query()
+            ->published()
+            ->orderByDesc('published_at')
+            ->limit(3)
+            ->get()
+            ->map(
+                fn(NewsArticle $article): array => [
+                    'title' => $article->title,
+                    'category' => $article->category,
+                    'excerpt' => str($article->excerpt ?: strip_tags($article->content))
+                        ->limit(120)
+                        ->toString(),
+                    'date' => $article->published_at?->translatedFormat('d M Y') ?? '-',
+                ],
+            )
+            ->all();
+    }
+
+    public function getLatestAchievementsProperty(): array
+    {
+        return SchoolAchievement::query()
+            ->ordered()
+            ->limit(3)
+            ->get()
+            ->map(
+                fn(SchoolAchievement $achievement): array => [
+                    'title' => $achievement->title,
+                    'description' => str($achievement->description)->limit(100)->toString(),
+                    'meta' => trim(
+                        collect([$achievement->level, $achievement->year])
+                            ->filter()
+                            ->implode(' • '),
+                    ),
+                ],
+            )
+            ->all();
+    }
+
+    public function getSchoolHighlightsProperty(): array
+    {
+        return collect([['label' => 'Nama Sekolah', 'value' => $this->schoolInfo['Nama Sekolah'] ?? null], ['label' => 'NPSN', 'value' => $this->schoolInfo['NPSN'] ?? null], ['label' => 'Alamat', 'value' => $this->schoolInfo['Alamat'] ?? null], ['label' => 'No. Telepon', 'value' => $this->schoolInfo['No. Telepon'] ?? null]])
+            ->filter(fn(array $item): bool => filled($item['value']))
+            ->values()
+            ->all();
+    }
+
+    public function getAdminProfileProperty(): array
+    {
+        $user = Auth::user();
+        $roleLabel = $user?->roles()->pluck('display_name')->filter()->implode(', ');
+
+        return [
+            'name' => $user?->name ?? 'Admin Sekolah',
+            'email' => $user?->email ?? '-',
+            'role' => $roleLabel !== '' ? $roleLabel : 'Administrator',
+        ];
+    }
 };
 ?>
-<div>
 
-    <!-- Welcome Hero Section -->
-    <section
-        class="mb-10 bg-gradient-to-r from-primary to-primary-container p-10 rounded-[32px] text-white shadow-xl relative overflow-hidden">
-        <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
-            <div class="max-w-xl">
+<div class="space-y-8">
+    <section class="relative overflow-hidden rounded-4xl bg-primary p-8 text-white shadow-xl">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary via-primary to-primary-container opacity-95"></div>
+        <div class="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div class="max-w-3xl">
                 <span
-                    class="bg-white/20 px-4 py-1 rounded-full font-label-md text-[12px] uppercase tracking-wider mb-4 inline-block">Portal
-                    Akademik</span>
-                <h1 class="font-headline-xl text-headline-xl mb-4">Selamat Datang Kembali, Admin!</h1>
-                <p class="font-body-lg text-body-lg opacity-90">Pantau perkembangan sekolah, kelola data akademik,
-                    dan respon pesan pengunjung dalam satu dasbor terpadu. Hari ini ada 5 laporan baru yang
-                    membutuhkan perhatian Anda.</p>
-                <div class="flex gap-4 mt-8">
-                    <button
-                        class="bg-secondary-container text-on-secondary-container font-bold px-8 py-3 rounded-2xl hover:scale-105 transition-transform">Lihat
-                        Laporan Harian</button>
-                    <button
-                        class="bg-white/10 hover:bg-white/20 border border-white/30 backdrop-blur-md px-8 py-3 rounded-2xl transition-all">Pengaturan
-                        Cepat</button>
+                    class="inline-flex rounded-full bg-white/20 px-4 py-1 text-[12px] font-semibold uppercase tracking-[0.24em]">
+                    Dashboard Admin
+                </span>
+                <h1 class="mt-4 text-3xl font-bold tracking-tight">{{ $this->schoolName }}</h1>
+                <p class="mt-3 max-w-2xl text-sm leading-6 text-white/90 md:text-base">
+                    {{ $this->schoolMotto ?: 'Pantau data akademik, pendaftar SPMB, dan konten publik sekolah dari satu dashboard yang terhubung langsung ke data terbaru.' }}
+                </p>
+                <div class="mt-5 flex flex-wrap gap-3 text-sm text-white/90">
+                    @foreach ($this->heroStats as $item)
+                        <a href="{{ $item['route'] }}" wire:navigate
+                            class="rounded-full border border-white/20 bg-white/10 px-4 py-2 transition hover:bg-white/20">
+                            {{ $item['label'] }}: {{ number_format($item['value'], 0, ',', '.') }}
+                        </a>
+                    @endforeach
                 </div>
             </div>
-            <div class="hidden lg:block w-72 h-72">
-                <img class="w-full h-full object-cover rounded-3xl rotate-3 shadow-2xl border-4 border-white/20"
-                    data-alt="A high-energy, vibrant photo of a group of diverse elementary school students laughing and running in a sunny schoolyard. The shot captures a sense of joyful discovery and childhood wonder. The lighting is golden and warm, echoing a professional and modern school environment that bridges institutional reliability with playful energy."
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwUTPy-QLqANW5PtnB8CEPK3uRBWWX00i0QkW6hImMZw2nnW3yJoLwBbbeHrRSH3qvBNE2v2AE8I3DJWkgKwul0eOeNxZqdyGpdGlsDsk-Oc1MXzGs08oRbr8QmFbceDQwqCihWN0p-HeDOGO-OFqLSvg1LiFMayR3Q0aAXHR0S5RG9BbG0u7EaN6G1fbriVJUkEEPgvNst5YIDTHz_nL3bSWYByEn99I4zOTEodiPGI10U9azUUlVFHY55Y8nqC8NRbwpH-JE8IU" />
+
+            <div class="flex flex-wrap gap-3">
+                <a href="{{ route('admin.ppdb.pendaftar') }}" wire:navigate
+                    class="rounded-2xl bg-secondary-container px-6 py-3 font-semibold text-on-secondary-container transition hover:scale-[1.02]">
+                    Buka Data Pendaftar
+                </a>
+                <button wire:click="refreshStats" wire:loading.attr="disabled" wire:target="refreshStats"
+                    class="rounded-2xl border border-white/30 bg-white/10 px-6 py-3 font-semibold text-white transition hover:bg-white/20 disabled:opacity-60">
+                    <span wire:loading.remove wire:target="refreshStats">Perbarui Ringkasan</span>
+                    <span wire:loading wire:target="refreshStats">Memperbarui...</span>
+                </button>
             </div>
         </div>
-        <!-- Decorative Elements -->
-        <div class="absolute top-[-50px] right-[-50px] w-64 h-64 bg-secondary rounded-full opacity-20 blur-3xl">
-        </div>
-        <div class="absolute bottom-[-20px] left-[20%] w-40 h-40 bg-white rounded-full opacity-10 blur-2xl"></div>
+
+        <div class="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-white/10 blur-3xl"></div>
+        <div class="absolute -bottom-10 left-1/4 h-32 w-32 rounded-full bg-secondary/30 blur-2xl"></div>
     </section>
-    <!-- Stats Bento Grid -->
-    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-        <!-- Stat 1 -->
-        <div
-            class="bg-surface-container-lowest p-6 rounded-[24px] shadow-sm hover:shadow-md transition-shadow border border-outline-variant/10">
-            <div class="flex justify-between items-start mb-4">
-                <div class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
-                    <span class="material-symbols-outlined" data-icon="groups">groups</span>
+
+    <section class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+        @foreach ($this->summaryCards as $card)
+            <a href="{{ $card['route'] }}" wire:navigate
+                class="rounded-3xl border border-outline-variant/10 bg-surface-container-lowest p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                <div class="flex items-start justify-between gap-4">
+                    <div class="{{ $card['icon_class'] }} flex h-12 w-12 items-center justify-center rounded-2xl">
+                        <span class="material-symbols-outlined">{{ $card['icon'] }}</span>
+                    </div>
+                    <span
+                        class="rounded-full bg-surface-container px-3 py-1 text-xs font-semibold text-on-surface-variant">
+                        {{ $card['meta'] }}
+                    </span>
                 </div>
-                <span class="text-green-600 font-bold text-xs bg-green-50 px-2 py-1 rounded-lg">+12%</span>
-            </div>
-            <h3 class="font-label-md text-on-surface-variant">Total Siswa</h3>
-            <p class="font-stats-number text-stats-number text-on-surface">1,248</p>
-            <div class="mt-4 h-1 w-full bg-surface-container rounded-full overflow-hidden">
-                <div class="h-full bg-primary w-[75%] rounded-full"></div>
-            </div>
-        </div>
-        <!-- Stat 2 -->
-        <div
-            class="bg-surface-container-lowest p-6 rounded-[24px] shadow-sm hover:shadow-md transition-shadow border border-outline-variant/10">
-            <div class="flex justify-between items-start mb-4">
-                <div class="w-12 h-12 bg-secondary/10 rounded-2xl flex items-center justify-center text-secondary">
-                    <span class="material-symbols-outlined" data-icon="person">person</span>
-                </div>
-                <span class="text-blue-600 font-bold text-xs bg-blue-50 px-2 py-1 rounded-lg">Tetap</span>
-            </div>
-            <h3 class="font-label-md text-on-surface-variant">Total Guru</h3>
-            <p class="font-stats-number text-stats-number text-on-surface">84</p>
-            <div class="mt-4 h-1 w-full bg-surface-container rounded-full overflow-hidden">
-                <div class="h-full bg-secondary w-[90%] rounded-full"></div>
-            </div>
-        </div>
-        <!-- Stat 3 -->
-        <div
-            class="bg-surface-container-lowest p-6 rounded-[24px] shadow-sm hover:shadow-md transition-shadow border border-outline-variant/10">
-            <div class="flex justify-between items-start mb-4">
-                <div
-                    class="w-12 h-12 bg-tertiary-fixed-dim/30 rounded-2xl flex items-center justify-center text-tertiary">
-                    <span class="material-symbols-outlined" data-icon="app_registration">app_registration</span>
-                </div>
-                <span class="text-secondary font-bold text-xs bg-secondary-fixed/30 px-2 py-1 rounded-lg">Baru</span>
-            </div>
-            <h3 class="font-label-md text-on-surface-variant">Pendaftar SPMB</h3>
-            <p class="font-stats-number text-stats-number text-on-surface">156</p>
-            <div class="mt-4 h-1 w-full bg-surface-container rounded-full overflow-hidden">
-                <div class="h-full bg-tertiary-container w-[45%] rounded-full"></div>
-            </div>
-        </div>
-        <!-- Stat 4 -->
-        <div
-            class="bg-surface-container-lowest p-6 rounded-[24px] shadow-sm hover:shadow-md transition-shadow border border-outline-variant/10">
-            <div class="flex justify-between items-start mb-4">
-                <div class="w-12 h-12 bg-error-container/20 rounded-2xl flex items-center justify-center text-error">
-                    <span class="material-symbols-outlined" data-icon="mail">mail</span>
-                </div>
-                <span class="text-error font-bold text-xs bg-error-container/40 px-2 py-1 rounded-lg">Urgent</span>
-            </div>
-            <h3 class="font-label-md text-on-surface-variant">Pesan Masuk</h3>
-            <p class="font-stats-number text-stats-number text-on-surface">09</p>
-            <div class="mt-4 h-1 w-full bg-surface-container rounded-full overflow-hidden">
-                <div class="h-full bg-error w-[20%] rounded-full"></div>
-            </div>
-        </div>
+
+                <p class="mt-5 text-sm font-medium text-on-surface-variant">{{ $card['label'] }}</p>
+                <p class="mt-2 text-4xl font-bold text-on-surface">{{ number_format($card['value'], 0, ',', '.') }}</p>
+            </a>
+        @endforeach
     </section>
-    <!-- Main Dashboard Content Area -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Recent Activity List (Bento Column 1 & 2) -->
-        <div class="lg:col-span-2 space-y-6">
-            <div class="bg-surface-container-lowest rounded-[32px] p-8 shadow-sm border border-outline-variant/10">
-                <div class="flex justify-between items-center mb-8">
+
+    <div class="grid grid-cols-1 gap-8 xl:grid-cols-[1.6fr_1fr]">
+        <div class="space-y-8">
+            <section class="rounded-4xl border border-outline-variant/10 bg-surface-container-lowest p-8 shadow-sm">
+                <div class="flex items-center justify-between gap-3">
                     <div>
-                        <h2 class="font-headline-md text-headline-md text-primary">Aktivitas Terkini</h2>
-                        <p class="font-body-md text-on-surface-variant">Pantauan sistem log administratif terakhir.
-                        </p>
+                        <h2 class="text-2xl font-bold text-primary">Status SPMB Saat Ini</h2>
+                        <p class="mt-2 text-sm text-on-surface-variant">Ringkasan seluruh jalur status pendaftar
+                            berdasarkan data terbaru.</p>
                     </div>
-                    <button class="text-primary font-bold hover:underline">Lihat Semua</button>
+                    <a href="{{ route('admin.ppdb.index') }}" wire:navigate
+                        class="text-sm font-semibold text-primary hover:underline">
+                        Buka modul SPMB
+                    </a>
                 </div>
-                <div class="space-y-6">
-                    <!-- Activity Item 1 -->
-                    <div class="flex gap-4 p-4 hover:bg-surface-container-low rounded-2xl transition-colors group">
-                        <div class="w-12 h-12 shrink-0 rounded-full bg-primary/5 flex items-center justify-center">
-                            <span class="material-symbols-outlined text-primary" data-icon="edit_note">edit_note</span>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex justify-between">
-                                <p class="font-body-md font-bold text-on-surface">Pembaruan Visi &amp; Misi</p>
-                                <span class="font-label-md text-[12px] text-on-surface-variant">2 jam yang
-                                    lalu</span>
+
+                <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    @foreach ($this->spmbStatuses as $status)
+                        <a href="{{ $status['route'] }}" wire:navigate
+                            class="{{ $status['card_class'] }} rounded-2xl border border-slate-200 bg-white p-5 transition">
+                            <div class="flex items-center justify-between gap-3">
+                                <p class="text-sm font-semibold text-slate-700">{{ $status['label'] }}</p>
+                                <span class="{{ $status['pill_class'] }} rounded-full px-3 py-1 text-xs font-semibold">
+                                    {{ number_format($status['value'], 0, ',', '.') }}
+                                </span>
                             </div>
-                            <p class="text-on-surface-variant text-sm mt-1">Admin Budi memperbarui konten halaman
-                                visi misi sekolah untuk periode 2024.</p>
-                        </div>
-                        <div class="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                            <span class="material-symbols-outlined text-outline"
-                                data-icon="chevron_right">chevron_right</span>
-                        </div>
+                            <p class="mt-3 text-sm leading-6 text-slate-600">{{ $status['description'] }}</p>
+                        </a>
+                    @endforeach
+                </div>
+            </section>
+
+            <section class="rounded-4xl border border-outline-variant/10 bg-surface-container-lowest p-8 shadow-sm">
+                <div class="flex items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-2xl font-bold text-primary">Berita &amp; Pengumuman Terbaru</h2>
+                        <p class="mt-2 text-sm text-on-surface-variant">Konten publik terakhir yang sudah tayang di
+                            website sekolah.</p>
                     </div>
-                    <!-- Activity Item 2 -->
-                    <div class="flex gap-4 p-4 hover:bg-surface-container-low rounded-2xl transition-colors group">
-                        <div class="w-12 h-12 shrink-0 rounded-full bg-secondary/10 flex items-center justify-center">
-                            <span class="material-symbols-outlined text-secondary"
-                                data-icon="verified_user">verified_user</span>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex justify-between">
-                                <p class="font-body-md font-bold text-on-surface">Verifikasi Siswa SPMB</p>
-                                <span class="font-label-md text-[12px] text-on-surface-variant">5 jam yang
-                                    lalu</span>
-                            </div>
-                            <p class="text-on-surface-variant text-sm mt-1">12 berkas calon siswa baru telah
-                                diverifikasi dan dipindahkan ke status 'Diterima'.</p>
-                        </div>
-                        <div class="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                            <span class="material-symbols-outlined text-outline"
-                                data-icon="chevron_right">chevron_right</span>
-                        </div>
-                    </div>
-                    <!-- Activity Item 3 -->
-                    <div class="flex gap-4 p-4 hover:bg-surface-container-low rounded-2xl transition-colors group">
+                    <a href="{{ route('admin.publik.berita') }}" wire:navigate
+                        class="text-sm font-semibold text-primary hover:underline">
+                        Kelola berita
+                    </a>
+                </div>
+
+                <div class="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
+                    @forelse ($this->latestNews as $article)
+                        <article class="rounded-3xl border border-slate-200 bg-white p-5">
+                            <span class="rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-800">
+                                {{ $article['category'] ?: 'Berita' }}
+                            </span>
+                            <h3 class="mt-4 text-lg font-bold text-slate-800">{{ $article['title'] }}</h3>
+                            <p class="mt-3 text-sm leading-6 text-slate-600">{{ $article['excerpt'] }}</p>
+                            <p class="mt-4 text-xs font-medium uppercase tracking-wide text-slate-400">
+                                {{ $article['date'] }}</p>
+                        </article>
+                    @empty
                         <div
-                            class="w-12 h-12 shrink-0 rounded-full bg-tertiary-fixed/30 flex items-center justify-center">
-                            <span class="material-symbols-outlined text-tertiary" data-icon="campaign">campaign</span>
+                            class="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-500 lg:col-span-3">
+                            Belum ada berita yang dipublikasikan. Tambahkan berita dari modul publik agar dashboard
+                            menampilkan pembaruan terbaru.
                         </div>
-                        <div class="flex-1">
-                            <div class="flex justify-between">
-                                <p class="font-body-md font-bold text-on-surface">Pengumuman Libur Nasional</p>
-                                <span class="font-label-md text-[12px] text-on-surface-variant">Kemarin,
-                                    14:20</span>
-                            </div>
-                            <p class="text-on-surface-variant text-sm mt-1">Sistem menjadwalkan pengiriman
-                                notifikasi pengumuman libur Idul Fitri kepada seluruh wali murid.</p>
-                        </div>
-                        <div class="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                            <span class="material-symbols-outlined text-outline"
-                                data-icon="chevron_right">chevron_right</span>
-                        </div>
-                    </div>
+                    @endforelse
                 </div>
-            </div>
+            </section>
         </div>
-        <!-- Side Bento Column -->
-        <div class="space-y-6">
-            <!-- Quick Info Card -->
-            <div
-                class="bg-surface-container-highest/30 backdrop-blur-sm p-8 rounded-[32px] border border-white relative overflow-hidden">
-                <h3 class="font-headline-md text-on-surface mb-6 relative z-10">Agenda Sekolah</h3>
-                <div class="space-y-4 relative z-10">
-                    <div class="bg-white p-4 rounded-2xl shadow-sm flex gap-4 items-center">
-                        <div class="text-center bg-primary-fixed text-primary px-3 py-1 rounded-xl">
-                            <span class="block font-bold text-lg">15</span>
-                            <span class="block text-[10px] uppercase">Okt</span>
-                        </div>
-                        <div>
-                            <p class="font-label-md text-on-surface">Rapat Guru Bulanan</p>
-                            <p class="text-[12px] text-on-surface-variant">08:00 - 10:00 WIB</p>
-                        </div>
+
+        <div class="space-y-8">
+            <section class="rounded-4xl bg-primary p-8 text-white shadow-sm">
+                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-white/70">Admin Aktif</p>
+                <h2 class="mt-3 text-2xl font-bold">{{ $this->adminProfile['name'] }}</h2>
+                <p class="mt-1 text-sm text-white/80">{{ $this->adminProfile['role'] }}</p>
+
+                <dl class="mt-6 space-y-4">
+                    <div class="rounded-2xl bg-white/10 p-4">
+                        <dt class="text-xs uppercase tracking-wide text-white/60">Email</dt>
+                        <dd class="mt-1 text-sm font-semibold">{{ $this->adminProfile['email'] }}</dd>
                     </div>
-                    <div class="bg-white p-4 rounded-2xl shadow-sm flex gap-4 items-center">
-                        <div class="text-center bg-secondary-fixed text-secondary px-3 py-1 rounded-xl">
-                            <span class="block font-bold text-lg">18</span>
-                            <span class="block text-[10px] uppercase">Okt</span>
-                        </div>
-                        <div>
-                            <p class="font-label-md text-on-surface">Pekan Seni Siswa</p>
-                            <p class="text-[12px] text-on-surface-variant">Auditorium Utama</p>
-                        </div>
+                    <div class="rounded-2xl bg-white/10 p-4">
+                        <dt class="text-xs uppercase tracking-wide text-white/60">Menunggu Validasi</dt>
+                        <dd class="mt-1 text-sm font-semibold">
+                            {{ number_format($this->heroStats[0]['value'], 0, ',', '.') }} pendaftar SPMB
+                        </dd>
                     </div>
+                </dl>
+            </section>
+
+            <section class="rounded-4xl border border-outline-variant/10 bg-surface-container-lowest p-8 shadow-sm">
+                <div class="flex items-center justify-between gap-3">
+                    <h2 class="text-xl font-bold text-primary">Informasi Sekolah</h2>
+                    <a href="{{ route('admin.publik.info-sekolah') }}" wire:navigate
+                        class="text-sm font-semibold text-primary hover:underline">
+                        Edit info
+                    </a>
                 </div>
-                <div class="absolute -bottom-10 -right-10 opacity-10">
-                    <span class="material-symbols-outlined text-[150px]"
-                        data-icon="calendar_month">calendar_month</span>
+
+                <div class="mt-5 space-y-3">
+                    @forelse ($this->schoolHighlights as $item)
+                        <div class="rounded-2xl border border-slate-200 bg-white p-4">
+                            <p class="text-xs uppercase tracking-wide text-slate-500">{{ $item['label'] }}</p>
+                            <p class="mt-1 text-sm font-semibold text-slate-800">{{ $item['value'] }}</p>
+                        </div>
+                    @empty
+                        <div
+                            class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">
+                            Informasi sekolah belum diisi. Lengkapi data profil sekolah agar dashboard menampilkan
+                            ringkasan yang lebih akurat.
+                        </div>
+                    @endforelse
                 </div>
-            </div>
-            <!-- Admin Profile Short-card -->
-            <div class="bg-primary p-8 rounded-[32px] text-white">
-                <div class="flex items-center gap-4 mb-6">
-                    <img alt="Sub-Admin Avatar" class="w-16 h-16 rounded-full border-4 border-white/20 object-cover"
-                        data-alt="A portrait of a senior school administrator, an elderly man with gray hair and glasses, looking professional and trustworthy. He is wearing a formal batik shirt, typical of Indonesian school administrators. The background is a clean school library with soft lighting, reflecting the institutional reliability and warmth of the Elementary Modernism style."
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCISCIkisITcLKwbIjiy5UvJRTbwmSicgL57XdKwfGmdMKO1ARMVAeTolmr-XwJ2I-UGv_rNpT4wp1vcTL_14V0_5kicYl0_q8fAtsSi4tcrY6cPT3OpSAJj4xAt0mCBUBQsZvhrw1XxTfO4rO6HsJu2XNsr4kMC1XK2iTikI9CddJW8Ff_p9sWdaAdULvlxi-PFct_nd-6E-FysHYt0ydZZ6V8DzRaxLrimYUduYZQfY4p75nC7t8vnod4E_QKZlaCl__5s2zJK1o" />
-                    <div>
-                        <p class="font-bold text-lg">Drs. M. Sulaiman</p>
-                        <p class="text-sm opacity-80">Kepala Administrasi</p>
-                    </div>
+            </section>
+
+            <section class="rounded-4xl border border-outline-variant/10 bg-surface-container-lowest p-8 shadow-sm">
+                <div class="flex items-center justify-between gap-3">
+                    <h2 class="text-xl font-bold text-primary">Prestasi Terbaru</h2>
+                    <a href="{{ route('admin.publik.prestasi') }}" wire:navigate
+                        class="text-sm font-semibold text-primary hover:underline">
+                        Kelola prestasi
+                    </a>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-white/10 p-4 rounded-2xl">
-                        <p class="text-xs opacity-70">Shift Hari Ini</p>
-                        <p class="font-bold">07:00 - 16:00</p>
-                    </div>
-                    <div class="bg-white/10 p-4 rounded-2xl">
-                        <p class="text-xs opacity-70">Izin Pending</p>
-                        <p class="font-bold">2 Guru</p>
-                    </div>
+
+                <div class="mt-5 space-y-4">
+                    @forelse ($this->latestAchievements as $achievement)
+                        <article class="rounded-2xl border border-slate-200 bg-white p-4">
+                            <h3 class="text-sm font-bold text-slate-800">{{ $achievement['title'] }}</h3>
+                            @if ($achievement['meta'] !== '')
+                                <p class="mt-1 text-xs font-semibold uppercase tracking-wide text-amber-700">
+                                    {{ $achievement['meta'] }}</p>
+                            @endif
+                            <p class="mt-2 text-sm leading-6 text-slate-600">{{ $achievement['description'] }}</p>
+                        </article>
+                    @empty
+                        <div
+                            class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">
+                            Belum ada prestasi yang ditambahkan.
+                        </div>
+                    @endforelse
                 </div>
-            </div>
+            </section>
         </div>
     </div>
-    <!-- News & Announcements (Asymmetric Grid) -->
-    <section class="mt-12">
-        <div class="flex items-center justify-between mb-8">
-            <h2 class="font-headline-md text-headline-md text-primary">Berita &amp; Pengumuman Sekolah</h2>
-            <button
-                class="flex items-center gap-2 bg-primary text-white px-6 py-2 rounded-full font-label-md hover:shadow-lg transition-shadow">
-                <span class="material-symbols-outlined text-sm" data-icon="add">add</span> Post Berita Baru
-            </button>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- News Card 1 -->
-            <div class="group cursor-pointer">
-                <div class="relative overflow-hidden rounded-3xl h-64 mb-4">
-                    <img alt="School News"
-                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        data-alt="A brightly lit classroom filled with creative student artwork and modern educational tools. The sun shines through large windows, highlighting a clean and inviting learning environment. The image uses a light-mode aesthetic with soft shadows and a professional, modern corporate-friendly feel suitable for a primary school's news section."
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOkVBSHCVlYza3gjZa7WaDDisd9NhIR60y62Xk27fGODNuo60Vt9Lbm3OVeqAQLi5Y2e5MLk3BwSe6rvHX-eunN_6d9Ij1BffoM1sjDX7MRtF4ivUJ2n0qyeSSGx2nGrftkDOMZBQsYvfSKUiE-b5tbdnzbhhUyaOLoeORwOtt5Nta-fAItyJw-q5IliOlbdlhs6LIPUvlEw6TLY7sLgZWz9nUfOc-e51Iq_fGjlaptB9rQeZ7fvsuTm1_OGL_2PlQLTihjTsJzWA" />
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent">
-                    </div>
-                    <div class="absolute bottom-4 left-4">
-                        <span
-                            class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-xs font-bold">Akademik</span>
-                    </div>
-                </div>
-                <h4 class="font-bold text-lg text-on-surface group-hover:text-primary transition-colors">Juara Umum
-                    Lomba Matematika Nasional</h4>
-                <p class="text-sm text-on-surface-variant mt-2 line-clamp-2">Siswa kelas 5B SD Cerdas berhasil
-                    membawa pulang piala bergilir dalam ajang kompetisi matematika yang diselenggarakan oleh
-                    Kemdikbud...</p>
-                <p class="text-xs text-outline mt-3 flex items-center gap-1">
-                    <span class="material-symbols-outlined text-xs" data-icon="calendar_today">calendar_today</span>
-                    12
-                    Okt 2023
-                </p>
-            </div>
-            <!-- News Card 2 -->
-            <div class="group cursor-pointer">
-                <div class="relative overflow-hidden rounded-3xl h-64 mb-4">
-                    <img alt="School Infrastructure"
-                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        data-alt="A modern, minimalist school auditorium with wooden accents and blue seating that matches the primary brand color. The space is clean, airy, and well-lit with professional photography style. The atmosphere communicates trust, reliability, and institutional excellence, reflecting a modern educational facility in its prime."
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAESSgWqPIn_0MUTHd3NNQIsPJqh5Qhqs8garj6DTSuNwDnUeUacSC2B7HzHbAb0hyoQVggBRS9gMmiqt88dSh_FS7PlFjN9OxCaru2ypH2mKNNf1Ndeg4GlV2yRVx4hcmIdws5pFRiPatLoZ3tn8eiNhdYk1YoHYGlc1lrc568pCmC2eeXfkuwJPmZap5eLgNF1wlhzDXZncN1pF38YoYhEA9DBQzKlYKPn8t_dLlXUDha5ZkHDZOTR44aBAG6XcSyz5C25xZKjpY" />
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent">
-                    </div>
-                    <div class="absolute bottom-4 left-4">
-                        <span class="bg-primary text-white px-3 py-1 rounded-full text-xs font-bold">Fasilitas</span>
-                    </div>
-                </div>
-                <h4 class="font-bold text-lg text-on-surface group-hover:text-primary transition-colors">Renovasi
-                    Gedung Olahraga Selesai</h4>
-                <p class="text-sm text-on-surface-variant mt-2 line-clamp-2">Kabar gembira! Fasilitas GOR baru kini
-                    siap digunakan untuk kegiatan ekstrakurikuler basket dan badminton mulai minggu depan...</p>
-                <p class="text-xs text-outline mt-3 flex items-center gap-1">
-                    <span class="material-symbols-outlined text-xs" data-icon="calendar_today">calendar_today</span>
-                    10
-                    Okt 2023
-                </p>
-            </div>
-            <!-- News Card 3 -->
-            <div class="group cursor-pointer">
-                <div class="relative overflow-hidden rounded-3xl h-64 mb-4">
-                    <img alt="Education Technology"
-                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        data-alt="Close-up of a student's hand using a sleek tablet device in a bright, modern classroom setting. The screen displays colorful educational software. The lighting is high-key and optimistic, focusing on the blend of technology and education. The composition is clean and follows the modern corporate-friendly style of the design system."
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBM-_iEe2-2PCB1oTHzsLPnA0GN7RogNxqJmrjQ073PGj2-uXikoAcJdOGk1uCZCnDLPC4lEU71x21NyjJK7ZBasa3LtrYxG136JSHaen815Ad01L_hbxDfnfzVnEfLz4EV-DOxuZUii2fYq5M2MceuEJNO6jQgPkO_k8hmL2nGYkbPYcZFGh_cMrr98W_LioxcBy4kUgUYHC9vU302pit6x4lkNqidofgnmUBqaaibU2TC7SKWbA4n7su5ox8KVMeKr_bvrwVGB20" />
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent">
-                    </div>
-                    <div class="absolute bottom-4 left-4">
-                        <span class="bg-secondary text-white px-3 py-1 rounded-full text-xs font-bold">SPMB</span>
-                    </div>
-                </div>
-                <h4 class="font-bold text-lg text-on-surface group-hover:text-primary transition-colors">Gelombang
-                    Kedua SPMB Resmi Dibuka</h4>
-                <p class="text-sm text-on-surface-variant mt-2 line-clamp-2">Pendaftaran calon siswa baru gelombang
-                    kedua telah dibuka secara online mulai hari ini. Pastikan berkas pendaftaran lengkap...</p>
-                <p class="text-xs text-outline mt-3 flex items-center gap-1">
-                    <span class="material-symbols-outlined text-xs" data-icon="calendar_today">calendar_today</span>
-                    08
-                    Okt 2023
-                </p>
-            </div>
-        </div>
-    </section>
 </div>

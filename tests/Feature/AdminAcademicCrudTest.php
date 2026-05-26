@@ -143,7 +143,7 @@ class AdminAcademicCrudTest extends TestCase
         $import = new TeachersImport;
 
         $import->collection(new Collection([
-            [
+            new Collection([
                 'nama' => 'Bapak Dedi Saputra',
                 'nuptk' => '1234567890123457',
                 'nip' => '198205052010011002',
@@ -156,11 +156,45 @@ class AdminAcademicCrudTest extends TestCase
                 'alamat' => 'Jl. Guru No. 3',
                 'hp' => '081300000003',
                 'email' => 'dedi@example.com',
-            ],
+            ]),
         ]));
 
         $this->assertSame(1, $import->processedRows());
         $this->assertDatabaseHas('teachers', ['email' => 'dedi@example.com']);
+    }
+
+    public function test_teacher_import_from_uploaded_csv_file_creates_records(): void
+    {
+        $user = User::factory()->create();
+
+        $csv = implode("\n", [
+            'nama,nuptk,nip,nik,jenis_kelamin,tempat_lahir,tanggal_lahir,status_kepegawaian,agama,alamat,hp,email',
+            'Bapak Dedi Saputra,1234567890123457,198205052010011002,3173000000003333,Laki-laki,Pontianak,1982-05-05,Tetap,Islam,"Jl. Guru No. 3",081300000003,dedi@example.com',
+        ]);
+
+        Livewire::actingAs($user)
+            ->test('pages::admin.akademik.guru')
+            ->call('openImport')
+            ->set('importFile', UploadedFile::fake()->createWithContent('guru.csv', $csv))
+            ->call('importTeachers')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('teachers', ['email' => 'dedi@example.com']);
+    }
+
+    public function test_teacher_import_shows_error_when_uploaded_file_has_no_data_rows(): void
+    {
+        $user = User::factory()->create();
+
+        $csv = 'nama,nuptk,nip,nik,jenis_kelamin,tempat_lahir,tanggal_lahir,status_kepegawaian,agama,alamat,hp,email';
+
+        Livewire::actingAs($user)
+            ->test('pages::admin.akademik.guru')
+            ->call('openImport')
+            ->set('importFile', UploadedFile::fake()->createWithContent('guru-kosong.csv', $csv))
+            ->call('importTeachers')
+            ->assertHasErrors(['importFile'])
+            ->assertDispatched('toast');
     }
 
     public function test_student_import_creates_records_and_resolves_class(): void

@@ -2,7 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Models\NewsArticle;
 use App\Models\Role;
+use App\Models\SchoolAchievement;
+use App\Models\SchoolClass;
+use App\Models\SchoolInformation;
+use App\Models\SpmbRegistration;
+use App\Models\Student;
+use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -27,6 +34,84 @@ class AdminUserManagementTest extends TestCase
         $this->actingAs($student)
             ->get(route('admin.dashboard'))
             ->assertForbidden();
+    }
+
+    public function test_admin_dashboard_displays_dynamic_summary(): void
+    {
+        $adminRole = $this->createRole('admin', 'Admin');
+
+        /** @var User $admin */
+        $admin = User::factory()->create([
+            'name' => 'Admin Dinamis',
+            'email' => 'admin@example.test',
+        ]);
+        $admin->syncRoles([$adminRole->name]);
+
+        SchoolInformation::query()->create([
+            'label' => 'Nama Sekolah',
+            'value' => 'SD Dinamis',
+            'sort_order' => 1,
+        ]);
+        SchoolInformation::query()->create([
+            'label' => 'Motto Sekolah',
+            'value' => 'Unggul dalam data dan layanan.',
+            'sort_order' => 2,
+        ]);
+
+        $classA = SchoolClass::query()->create(['name' => '1A']);
+        $classB = SchoolClass::query()->create(['name' => '1B']);
+
+        Student::factory()->create([
+            'school_class_id' => $classA->id,
+            'status' => 'AKTIF',
+        ]);
+        Student::factory()->create([
+            'school_class_id' => $classA->id,
+            'status' => 'AKTIF',
+        ]);
+        Student::factory()->create([
+            'school_class_id' => $classB->id,
+            'status' => 'LULUS',
+        ]);
+
+        Teacher::factory()->create([
+            'employment_status' => 'Tetap',
+        ]);
+        Teacher::factory()->create([
+            'employment_status' => 'Honorer',
+        ]);
+
+        SpmbRegistration::factory()->create(['status' => 'submitted']);
+        SpmbRegistration::factory()->create(['status' => 'verified']);
+        SpmbRegistration::factory()->create(['status' => 'lulus']);
+        SpmbRegistration::factory()->create(['status' => 'cadangan']);
+
+        NewsArticle::factory()->published()->create([
+            'title' => 'Berita Dashboard',
+            'category' => 'Pengumuman',
+        ]);
+        NewsArticle::factory()->draft()->create();
+
+        SchoolAchievement::query()->create([
+            'title' => 'Prestasi Dashboard',
+            'description' => 'Prestasi terbaru sekolah.',
+            'level' => 'Kabupaten',
+            'year' => 2026,
+            'sort_order' => 1,
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertSee('SD Dinamis')
+            ->assertSee('Unggul dalam data dan layanan.')
+            ->assertSee('Admin Dinamis')
+            ->assertSee('2 siswa aktif')
+            ->assertSee('1 guru tetap')
+            ->assertSee('1 belum divalidasi')
+            ->assertSee('Berita Dashboard')
+            ->assertSee('Prestasi Dashboard')
+            ->assertSee('Terverifikasi');
     }
 
     public function test_admin_can_create_update_and_delete_user(): void

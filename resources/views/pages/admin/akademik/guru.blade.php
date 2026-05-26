@@ -4,6 +4,7 @@ use App\Exports\TeachersTemplateExport;
 use App\Imports\TeachersImport;
 use App\Models\Teacher;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -154,8 +155,37 @@ new class extends Component {
             'importFile' => ['required', 'file', 'mimes:xlsx,xls,csv'],
         ]);
 
-        $import = new TeachersImport();
-        Excel::import($import, $this->importFile);
+        try {
+            $import = new TeachersImport();
+            Excel::import($import, $this->importFile);
+
+            if ($import->processedRows() === 0) {
+                throw ValidationException::withMessages([
+                    'importFile' => 'Tidak ada baris guru yang berhasil diproses. Gunakan template import dan pastikan data terisi.',
+                ]);
+            }
+        } catch (ValidationException $exception) {
+            $this->resetValidation();
+
+            foreach ($exception->errors() as $field => $messages) {
+                foreach ($messages as $message) {
+                    $this->addError($field, $message);
+                }
+            }
+
+            $this->dispatch('toast', type: 'error', message: collect($exception->errors())->flatten()->first() ?? 'Import guru gagal.');
+
+            return;
+        } catch (\Throwable $throwable) {
+            $message = 'Terjadi kesalahan saat mengimpor data guru.';
+
+            $this->addError('importFile', $message);
+            $this->dispatch('toast', type: 'error', message: $message);
+
+            report($throwable);
+
+            return;
+        }
 
         $this->resetImportForm();
         $this->showImportModal = false;

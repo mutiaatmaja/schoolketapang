@@ -386,10 +386,10 @@
         })();
     </script>
     <!-- FAB Suppression: On Dashboard, FAB can be active -->
-    <button
+    {{-- <button
         class="fixed bottom-8 right-8 z-60 flex h-16 w-16 items-center justify-center rounded-full bg-secondary text-on-secondary shadow-2xl transition-all hover:scale-110 active:scale-95">
         <span class="material-symbols-outlined text-3xl" data-icon="chat">chat</span>
-    </button>
+    </button> --}}
     <div x-data="{ show: false, type: 'info', message: '', timeout: null }"
         x-on:toast.window="
                 show = true;

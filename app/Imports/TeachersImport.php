@@ -18,9 +18,11 @@ class TeachersImport implements ToCollection, WithHeadingRow
     public function collection(Collection $collection): void
     {
         $collection
-            ->filter(fn (array $row): bool => collect($row)->filter(fn ($value) => $value !== null && $value !== '')->isNotEmpty())
-            ->each(function (array $row): void {
-                $data = Validator::make($row, $this->rules(), [], $this->validationAttributes())->validate();
+            ->map(fn (array|Collection $row): Collection => collect($row))
+            ->map(fn (Collection $row): Collection => $this->normalizeRow($row))
+            ->filter(fn (Collection $row): bool => $row->filter(fn ($value) => $value !== null && $value !== '')->isNotEmpty())
+            ->each(function (Collection $row): void {
+                $data = Validator::make($row->all(), $this->rules(), [], $this->validationAttributes())->validate();
 
                 Teacher::query()->updateOrCreate(
                     ['nik' => trim((string) $data['nik'])],
@@ -50,7 +52,7 @@ class TeachersImport implements ToCollection, WithHeadingRow
             'nuptk' => ['nullable', 'string', 'max:30'],
             'nip' => ['nullable', 'string', 'max:30'],
             'nik' => ['required', 'string', 'max:30'],
-            'jenis_kelamin' => ['required', 'string', 'in:Laki-laki,Perempuan'],
+            'jenis_kelamin' => ['required', 'string', 'in:Laki-Laki,Perempuan'],
             'tempat_lahir' => ['required', 'string', 'max:100'],
             'tanggal_lahir' => ['required'],
             'status_kepegawaian' => ['required', 'string', 'max:100'],
@@ -85,6 +87,25 @@ class TeachersImport implements ToCollection, WithHeadingRow
     public function processedRows(): int
     {
         return $this->processedRows;
+    }
+
+    private function normalizeRow(Collection $row): Collection
+    {
+        return $row->map(function (mixed $value): mixed {
+            if ($value === null) {
+                return null;
+            }
+
+            if (is_string($value)) {
+                return trim($value);
+            }
+
+            if (is_int($value) || is_float($value)) {
+                return (string) $value;
+            }
+
+            return $value;
+        });
     }
 
     private function nullableString(mixed $value): ?string

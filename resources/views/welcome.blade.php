@@ -486,7 +486,7 @@
                             </div>
                         </div>
                     </div>
-                    <form class="space-y-6">
+                    {{-- <form class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block font-label-md text-label-md text-on-surface-variant mb-2">Nama
@@ -519,7 +519,7 @@
                         <button
                             class="w-full bg-secondary-container text-on-secondary-container font-label-md text-label-md py-4 rounded-2xl shadow-lg hover:scale-[1.02] active:scale-95 transition-all"
                             type="button">Kirim Pesan Sekarang</button>
-                    </form>
+                    </form> --}}
                 </div>
             </div>
         </div>
@@ -574,21 +574,7 @@
         </div>
     </footer>
     <!-- SideNavBar (Floating Quick Contact) -->
-    <div class="fixed bottom-8 right-8 z-100">
-        <div class="group relative">
-            <!-- Tooltip -->
-            <div
-                class="absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-secondary text-on-secondary px-4 py-2 rounded-xl text-label-md font-label-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
-                Chat with us
-            </div>
-            <!-- FAB -->
-            <button
-                class="bg-secondary dark:bg-secondary-fixed text-on-secondary dark:text-on-secondary-fixed rounded-full p-4 w-16 h-16 flex items-center justify-center shadow-[0_24px_48px_rgba(30,64,175,0.15)] hover:scale-110 hover:shadow-xl transition-all duration-300 active:scale-90">
-                <span class="material-symbols-outlined text-3xl"
-                    style="font-variation-settings: 'FILL' 1;">chat</span>
-            </button>
-        </div>
-    </div>
+
 </body>
 
 </html>
