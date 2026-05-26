@@ -568,7 +568,7 @@
                     </a>
                 </div>
                 <div class="mt-8 text-on-surface-variant text-sm">
-                    © 2024 {{ $schoolName }}. All rights reserved.
+                    © 2026 {{ $schoolName }}. All rights reserved.
                 </div>
             </div>
         </div>

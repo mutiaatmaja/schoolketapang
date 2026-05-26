@@ -175,8 +175,8 @@
             <div>
                 <h1
                     class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed leading-tight">
-                    Admin SD Cerdas</h1>
-                <p class="font-label-md text-label-md text-on-surface-variant opacity-70">Elementary School Portal</p>
+                    Admin</h1>
+                <p class="font-label-md text-label-md text-on-surface-variant opacity-70">Admin Portal</p>
             </div>
         </div>
         <div class="px-6 mb-6">
